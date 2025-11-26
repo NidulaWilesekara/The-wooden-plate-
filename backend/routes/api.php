@@ -1,6 +1,7 @@
 <?php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AdminAuthAPIController;
+use App\Http\Controllers\Api\CustomerAPIController;
 
 
 Route::prefix('admin')->group(function () {
@@ -10,9 +11,13 @@ Route::prefix('admin')->group(function () {
         Route::post('logout', [AdminAuthAPIController::class, 'logout'])->name('admin.logout');
         Route::get('profile', [AdminAuthAPIController::class, 'profile'])->name('admin.profile');
         Route::put('profile', [AdminAuthAPIController::class, 'updateProfile'])->name('admin.updateProfile');
-        // Add dashboard route here if needed
+        
+        // Dashboard
         Route::get('dashboard', function () {
             return response()->json(['message' => 'Welcome to Admin Dashboard']);
         })->name('admin.dashboard');
+        
+        // Customer Management
+        Route::apiResource('customers', CustomerAPIController::class);
     });
 });
