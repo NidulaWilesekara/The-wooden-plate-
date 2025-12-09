@@ -1,7 +1,7 @@
 import './App.css'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import AdminLogin from './pages/AdminLogin.jsx'
-import AdminDashboard from './pages/AdminDashboard.jsx'
+import AdminLogin from './admin/pages/AdminLogin.jsx'
+import AdminDashboard from './admin/pages/AdminDashboard.jsx'
 
 function App() {
   return (

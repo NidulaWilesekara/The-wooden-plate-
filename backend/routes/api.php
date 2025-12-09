@@ -2,6 +2,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AdminAuthAPIController;
 use App\Http\Controllers\Api\CustomerAPIController;
+use App\Http\Controllers\Api\DetailsAPIController;
 
 
 Route::prefix('admin')->group(function () {
@@ -19,5 +20,8 @@ Route::prefix('admin')->group(function () {
         
         // Customer Management
         Route::apiResource('customers', CustomerAPIController::class);
+        
+        // Shop Details Management
+        Route::apiResource('details', DetailsAPIController::class);
     });
 });
