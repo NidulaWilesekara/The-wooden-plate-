@@ -16,7 +16,9 @@ class DetailsAPIController extends Controller
     {
         try {
             $details = Details::all();
-            return response()->json($details);
+            return response()->json([
+                'data' => $details
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to retrieve details',
@@ -51,7 +53,9 @@ class DetailsAPIController extends Controller
     {
         try {
             $details = Details::findOrFail($id);
-            return response()->json($details);
+            return response()->json([
+                'data' => $details
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Details not found',
