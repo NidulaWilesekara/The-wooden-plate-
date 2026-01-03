@@ -28,14 +28,22 @@ const AdminNavbar = () => {
   };
 
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center px-6 md:px-10 shadow-sm">
-      {/* LEFT: logo */}
+
+    <header className="h-20 bg-white border-b border-gray-200 flex items-center px-6 md:px-10 shadow-sm">
+      {/* LEFT: animated brand name */}
       <div className="flex items-center gap-3">
-        <img
-          src="/logo.png"
-          alt="The Wooden Plate"
-          className="h-10 w-auto object-contain"
-        />
+        <h1
+          className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-orange-400 via-amber-500 to-yellow-400 bg-clip-text text-transparent animate-shimmer"
+          style={{
+            backgroundSize: '200% auto',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            color: 'transparent',
+            animation: 'shimmer 2.5s linear infinite',
+          }}
+        >
+          The Wooden Plate
+        </h1>
       </div>
 
       {/* CENTER: empty for now */}
@@ -103,3 +111,19 @@ const AdminNavbar = () => {
 };
 
 export default AdminNavbar;
+
+// Add shimmer animation keyframes
+const style = document.createElement('style');
+style.innerHTML = `
+@keyframes shimmer {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}`;
+if (!document.head.querySelector('style[data-admin-navbar-shimmer]')) {
+  style.setAttribute('data-admin-navbar-shimmer', '');
+  document.head.appendChild(style);
+}

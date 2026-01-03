@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminLayout from "../../components/AdminLayout";
 import toast from "react-hot-toast";
@@ -6,41 +6,39 @@ import toast from "react-hot-toast";
 const EditCustomer = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     address: "",
   });
+
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
+  const token = localStorage.getItem("admin_token");
 
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
-        const token = localStorage.getItem("admin_token");
-        const response = await fetch(
-          `http://localhost:8000/api/admin/customers/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) throw new Error("Failed to fetch customer");
-
-        const result = await response.json();
-        console.log("API Response:", result);
-        const data = result.data || result;
-        console.log("Customer Data:", data);
-        setFormData({
-          name: data.name || "",
-          email: data.email || "",
-          phone: data.phone || "",
-          address: data.address || "",
+        setLoading(true);
+        const res = await fetch(`http://localhost:8000/api/admin/customers/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-      } catch (error) {
+
+        if (!res.ok) throw new Error("Failed to fetch customer");
+
+        const result = await res.json();
+        const data = result.data || result;
+
+        setFormData({
+          name: data?.name ?? "",
+          email: data?.email ?? "",
+          phone: data?.phone ?? "",
+          address: data?.address ?? "",
+        });
+      } catch (e) {
         toast.error("Failed to load customer");
         navigate("/admin/customers");
       } finally {
@@ -48,14 +46,11 @@ const EditCustomer = () => {
       }
     };
 
-    fetchCustomer();
-  }, [id, navigate]);
+    if (id) fetchCustomer();
+  }, [id, navigate, token]);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
@@ -63,139 +58,127 @@ const EditCustomer = () => {
     setSubmitting(true);
 
     try {
-      const token = localStorage.getItem("admin_token");
-      const response = await fetch(
-        `http://localhost:8000/api/admin/customers/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const res = await fetch(`http://localhost:8000/api/admin/customers/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
 
-      if (!response.ok) throw new Error("Failed to update customer");
+      if (!res.ok) throw new Error("Failed to update customer");
 
       toast.success("Customer updated successfully");
       navigate("/admin/customers");
-    } catch (error) {
+    } catch (e2) {
       toast.error("Failed to update customer");
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (loading) {
-    return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-orange-600">Loading...</div>
-        </div>
-      </AdminLayout>
-    );
-  }
-
   return (
     <AdminLayout>
-      <div className="p-6 max-w-2xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div className="mb-10 bg-gradient-to-r from-orange-50 to-orange-100 p-6 rounded-xl border-l-4 border-orange-500 shadow-sm">
-          <h1 className="text-3xl font-bold text-orange-600">Edit Customer</h1>
-          <p className="text-sm text-orange-600 mt-2">
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+            Edit Customer
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
             Update customer information
           </p>
         </div>
 
-        {/* Form */}
-        <div className="bg-white rounded-xl shadow-sm border border-orange-100 p-6">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Name */}
-            <div>
-              <label className="block text-sm font-medium text-orange-700 mb-2">
-                Customer Name *
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-orange-900 bg-white"
-                placeholder="Enter customer name"
-              />
-            </div>
+        {/* Loading */}
+        {loading ? (
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6 text-gray-600">
+            Loading customer...
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                    Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
 
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-orange-700 mb-2">
-                Email *
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-orange-900 bg-white"
-                placeholder="customer@example.com"
-              />
-            </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                    Email <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
 
-            {/* Phone */}
-            <div>
-              <label className="block text-sm font-medium text-orange-700 mb-2">
-                Phone *
-              </label>
-              <input
-                type="text"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-orange-900 bg-white"
-                placeholder="Enter phone number"
-              />
-            </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                    Phone
+                  </label>
+                  <input
+                    type="text"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
 
-            {/* Address */}
-            <div>
-              <label className="block text-sm font-medium text-orange-700 mb-2">
-                Address *
-              </label>
-              <textarea
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                required
-                rows="3"
-                className="w-full px-4 py-2.5 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none text-orange-900 bg-white"
-                placeholder="Enter full address"
-              />
-            </div>
-
-            {/* Buttons */}
-            <div className="flex items-center gap-3 pt-4">
-              <div
-                onClick={handleSubmit}
-                className={`flex-1 px-6 py-2.5 bg-orange-500 text-white rounded-lg text-center font-medium transition-colors cursor-pointer ${
-                  submitting
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-orange-600"
-                }`}
-              >
-                {submitting ? "Updating..." : "Update Customer"}
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                    Address
+                  </label>
+                  <input
+                    type="text"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
               </div>
-              <div
-                onClick={() => navigate("/admin/customers")}
-                className="flex-1 px-6 py-2.5 bg-orange-100 text-orange-600 rounded-lg text-center font-medium hover:bg-orange-200 transition-colors cursor-pointer"
-              >
-                Cancel
+
+              <div className="flex flex-col md:flex-row gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className={`flex-1 rounded-lg px-5 py-2.5 text-white text-sm font-medium ${
+                    submitting
+                      ? "bg-blue-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700"
+                  }`}
+                >
+                  {submitting ? "Updating..." : "Update Customer"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => navigate("/admin/customers")}
+                  className="flex-1 rounded-lg px-5 py-2.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-800 text-sm font-medium"
+                >
+                  Cancel
+                </button>
               </div>
-            </div>
-          </form>
-        </div>
+            </form>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );
