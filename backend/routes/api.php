@@ -16,7 +16,6 @@ use App\Http\Controllers\Api\InventoryReportController;
 use App\Http\Controllers\Api\PublicMenuController;
 use App\Http\Controllers\Api\PublicOrderController;
 use App\Http\Controllers\CustomerAuthController;
-use App\Http\Controllers\CustomerPasswordController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController;
 
@@ -24,11 +23,10 @@ use App\Http\Controllers\OrderController;
 // PUBLIC CUSTOMER API ROUTES (No Auth Required)
 // ============================================
 Route::prefix('public')->group(function () {
-    // Customer Authentication
+    // Customer Authentication (OTP-based)
     Route::post('register', [CustomerAuthController::class, 'register']);
-    Route::post('login', [CustomerAuthController::class, 'login']);
-    Route::post('forgot-password', [CustomerPasswordController::class, 'forgotPassword']);
-    Route::post('reset-password', [CustomerPasswordController::class, 'resetPassword']);
+    Route::post('send-otp', [CustomerAuthController::class, 'sendOTP']);
+    Route::post('verify-otp', [CustomerAuthController::class, 'verifyOTP']);
 
     // Menu & Categories
     Route::get('categories', [PublicMenuController::class, 'categories']);

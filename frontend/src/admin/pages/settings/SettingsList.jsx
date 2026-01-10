@@ -71,36 +71,38 @@ const SettingsList = () => {
 
   return (
     <AdminLayout>
-      <div className="max-w-5xl mx-auto">
+      <div className="w-full max-w-5xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-orange-600">Shop Settings</h1>
-            <p className="text-sm text-orange-500 mt-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+              Shop Settings
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
               Manage your restaurant details
             </p>
           </div>
 
-          <div
+          <button
             onClick={() => navigate(`/admin/settings/edit/${s.id}`)}
-            className="px-6 py-2.5 bg-orange-500 text-white rounded-lg cursor-pointer hover:bg-orange-600 transition shadow"
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium shadow-sm"
           >
             Edit Settings
-          </div>
+          </button>
         </div>
 
         {/* Details Card */}
-        <div className="bg-white rounded-xl shadow-md border border-orange-100 p-8">
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-8">
           {/* Cafe name big at top */}
-          <div className="mb-6">
-            <p className="text-xs font-semibold text-orange-500">Cafe Name</p>
-            <p className="mt-1 text-2xl font-bold text-orange-800">
+          <div className="mb-6 pb-6 border-b border-gray-200">
+            <p className="text-xs font-semibold text-gray-500 mb-2">Cafe Name</p>
+            <p className="text-2xl font-bold text-gray-900">
               {cafeName}
             </p>
           </div>
 
           {/* 2-column info grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 text-left">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
             {/* Email */}
             <InfoField label="Email" value={s.contact_email} />
             {/* Phone */}
@@ -115,7 +117,7 @@ const SettingsList = () => {
 
             {/* Social links */}
             <div className="md:col-span-2">
-              <p className="text-xs font-semibold text-orange-500 mb-1">
+              <p className="text-xs font-semibold text-gray-500 mb-2">
                 Social Links
               </p>
               <div className="flex flex-wrap gap-4 mt-1 text-sm font-medium">
@@ -164,13 +166,13 @@ const SettingsList = () => {
           </div>
 
           {/* Back button */}
-          <div className="flex justify-end mt-8">
-            <div
+          <div className="flex justify-end mt-8 pt-6 border-t border-gray-200">
+            <button
               onClick={() => navigate("/admin/dashboard")}
-              className="px-6 py-2.5 bg-orange-100 text-orange-600 rounded-lg cursor-pointer hover:bg-orange-200 transition"
+              className="px-6 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium"
             >
               Back to Dashboard
-            </div>
+            </button>
           </div>
         </div>
       </div>
@@ -185,8 +187,8 @@ const InfoField = ({ label, value, full }) => {
   if (!value) return null;
   return (
     <div className={full ? "md:col-span-2" : ""}>
-      <p className="text-xs font-semibold text-orange-500 mb-1">{label}</p>
-      <p className="text-sm text-orange-900 font-medium break-words">
+      <p className="text-xs font-semibold text-gray-500 mb-2">{label}</p>
+      <p className="text-sm text-gray-900 font-medium break-words">
         {value}
       </p>
     </div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminLayout from "../../components/AdminLayout";
+import ConfirmModal from "../../components/ConfirmModal";
 import toast from "react-hot-toast";
 
 const EditCustomer = () => {
@@ -16,6 +17,7 @@ const EditCustomer = () => {
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const token = localStorage.getItem("admin_token");
 
@@ -23,9 +25,11 @@ const EditCustomer = () => {
     const fetchCustomer = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`http://localhost:8000/api/admin/customers/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+
+        const res = await fetch(
+          `http://localhost:8000/api/admin/customers/${id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
         if (!res.ok) throw new Error("Failed to fetch customer");
 
@@ -53,26 +57,44 @@ const EditCustomer = () => {
     setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    if (submitting) return;
+    setShowConfirm(true);
+  };
+
+  const handleConfirmUpdate = async () => {
     setSubmitting(true);
 
     try {
-      const res = await fetch(`http://localhost:8000/api/admin/customers/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      });
+      const res = await fetch(
+        `http://localhost:8000/api/admin/customers/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
-      if (!res.ok) throw new Error("Failed to update customer");
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Handle validation errors (422)
+        if (res.status === 422 && data.errors) {
+          const errorMessages = Object.values(data.errors).flat();
+          errorMessages.forEach((msg) => toast.error(msg));
+          return;
+        }
+        throw new Error(data.message || "Failed to update customer");
+      }
 
       toast.success("Customer updated successfully");
       navigate("/admin/customers");
     } catch (e2) {
-      toast.error("Failed to update customer");
+      toast.error(e2.message || "Failed to update customer");
     } finally {
       setSubmitting(false);
     }
@@ -80,89 +102,135 @@ const EditCustomer = () => {
 
   return (
     <AdminLayout>
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-            Edit Customer
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Update customer information
-          </p>
+      <div className="w-full">
+        {/* ✅ HEADER (match View page style) */}
+        <div className="mb-6">
+          <div className="w-full rounded-xl border border-gray-200 bg-gray-100 px-6 py-5 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                Edit Customer
+              </h1>
+              <p className="text-sm text-gray-600 mt-1">
+                Update customer information
+              </p>
+            </div>
+
+            <button
+              onClick={() => navigate("/admin/customers")}
+              className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg
+                         bg-white hover:bg-gray-50 border border-gray-200
+                         text-gray-800 text-sm font-medium transition"
+            >
+              ← Back to Customers
+            </button>
+          </div>
         </div>
 
-        {/* Loading */}
+        {/* ✅ CONTENT */}
         {loading ? (
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6 text-gray-600">
+          <div className="w-full rounded-2xl border border-gray-200 bg-white shadow-sm p-6 text-gray-600">
             Loading customer...
           </div>
         ) : (
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
-            <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="w-full rounded-2xl border border-gray-200 bg-white shadow-sm">
+            {/* TOP BAR (like view card top) */}
+            <div className="p-6 border-b border-gray-200 flex flex-col md:flex-row md:items-center gap-4">
+              <div className="flex-1 text-center md:text-left">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Update Details
+                </h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  Change fields and click “Update Customer”
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => navigate(`/admin/customers/view/${id}`)}
+                  className="px-5 py-2.5 rounded-lg bg-white hover:bg-gray-50 border border-gray-200
+                             text-gray-800 text-sm font-medium transition"
+                >
+                  View
+                </button>
+              </div>
+            </div>
+
+            {/* FORM */}
+            <form onSubmit={handleSubmit} className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                {/* Name */}
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs font-semibold text-gray-500">
                     Name <span className="text-red-500">*</span>
-                  </label>
+                  </p>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900
+                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                    placeholder="Enter customer name"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                {/* Email */}
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs font-semibold text-gray-500">
                     Email <span className="text-red-500">*</span>
-                  </label>
+                  </p>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900
+                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                    placeholder="Enter email"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-800 mb-2">
-                    Phone
-                  </label>
+                {/* Phone */}
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs font-semibold text-gray-500">Phone</p>
                   <input
                     type="text"
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900
+                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                    placeholder="Enter phone"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-800 mb-2">
-                    Address
-                  </label>
+                {/* Address */}
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs font-semibold text-gray-500">Address</p>
                   <input
                     type="text"
                     name="address"
                     value={formData.address}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900
+                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                    placeholder="Enter address"
                   />
                 </div>
               </div>
 
-              <div className="flex flex-col md:flex-row gap-3 pt-2">
+              {/* ACTION BUTTONS (same vibe as View) */}
+              <div className="mt-6 flex flex-col sm:flex-row gap-3 md:justify-end">
                 <button
                   type="submit"
                   disabled={submitting}
-                  className={`flex-1 rounded-lg px-5 py-2.5 text-white text-sm font-medium ${
-                    submitting
-                      ? "bg-blue-400 cursor-not-allowed"
-                      : "bg-blue-600 hover:bg-blue-700"
+                  className={`rounded-md cursor-pointer px-4 py-2 text-sm font-medium transition ${
+                    loading
+                      ? "bg-blue-400 cursor-not-allowed text-white"
+                      : "bg-blue-600 hover:bg-blue-700 text-white"
                   }`}
                 >
                   {submitting ? "Updating..." : "Update Customer"}
@@ -171,7 +239,9 @@ const EditCustomer = () => {
                 <button
                   type="button"
                   onClick={() => navigate("/admin/customers")}
-                  className="flex-1 rounded-lg px-5 py-2.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-800 text-sm font-medium"
+                  className="rounded-md px-4 py-2 text-sm font-medium
+                            bg-gray-100 hover:bg-gray-200 border border-gray-200
+                            text-gray-800 transition cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -180,6 +250,18 @@ const EditCustomer = () => {
           </div>
         )}
       </div>
+
+      {/* Confirm Update Modal */}
+      <ConfirmModal
+        isOpen={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={handleConfirmUpdate}
+        title="Update Customer"
+        message="Are you sure you want to update this customer's details?"
+        confirmText="Update"
+        cancelText="Cancel"
+        type="warning"
+      />
     </AdminLayout>
   );
 };

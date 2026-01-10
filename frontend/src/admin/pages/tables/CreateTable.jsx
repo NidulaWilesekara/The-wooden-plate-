@@ -54,15 +54,16 @@ const CreateTable = () => {
   return (
     <AdminLayout>
       <div className="max-w-3xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Create Table</h1>
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Create Table</h1>
+          <p className="text-sm text-gray-500 mt-1">Add a new table</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Table Number *
+              <label className="block text-sm font-medium text-gray-800 mb-2">
+                Table Number <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -76,8 +77,8 @@ const CreateTable = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Number of Chairs *
+              <label className="block text-sm font-medium text-gray-800 mb-2">
+                Number of Chairs <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -93,7 +94,7 @@ const CreateTable = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Notes
               </label>
               <textarea
@@ -131,7 +132,7 @@ const CreateTable = () => {
               <button
                 type="button"
                 onClick={() => navigate("/admin/tables")}
-                className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"
+                className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>

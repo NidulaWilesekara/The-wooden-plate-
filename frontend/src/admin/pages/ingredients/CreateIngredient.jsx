@@ -58,23 +58,28 @@ const CreateIngredient = () => {
   return (
     <AdminLayout>
       <div className="max-w-3xl mx-auto space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Add New Ingredient</h1>
-          <button
-            onClick={() => navigate("/admin/ingredients")}
-            className="text-gray-600 hover:text-gray-900"
-          >
-            ← Back to List
-          </button>
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Add New Ingredient</h1>
+              <p className="text-sm text-gray-500 mt-1">Add a new ingredient to inventory</p>
+            </div>
+            <button
+              onClick={() => navigate("/admin/ingredients")}
+              className="text-gray-600 hover:text-gray-900"
+            >
+              ← Back to List
+            </button>
+          </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Ingredient Name *
+                <label className="block text-sm font-medium text-gray-800 mb-2">
+                  Ingredient Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -88,8 +93,8 @@ const CreateIngredient = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Unit *
+                <label className="block text-sm font-medium text-gray-800 mb-2">
+                  Unit <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="unit"
@@ -111,7 +116,7 @@ const CreateIngredient = () => {
             {/* Stock Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-800 mb-2">
                   Current Stock
                 </label>
                 <input
@@ -127,8 +132,8 @@ const CreateIngredient = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Reorder Level *
+                <label className="block text-sm font-medium text-gray-800 mb-2">
+                  Reorder Level <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
@@ -147,7 +152,7 @@ const CreateIngredient = () => {
             {/* Supplier Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-800 mb-2">
                   Supplier Name
                 </label>
                 <input
@@ -161,7 +166,7 @@ const CreateIngredient = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-800 mb-2">
                   Supplier Contact
                 </label>
                 <input
@@ -177,7 +182,7 @@ const CreateIngredient = () => {
 
             {/* Notes */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Notes
               </label>
               <textarea
@@ -216,7 +221,7 @@ const CreateIngredient = () => {
               <button
                 type="button"
                 onClick={() => navigate("/admin/ingredients")}
-                className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
               >
                 Cancel
               </button>

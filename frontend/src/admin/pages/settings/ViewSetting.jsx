@@ -61,82 +61,80 @@ const ViewSetting = () => {
     <AdminLayout>
       <div className="p-6">
         {/* Header */}
-        <div className="mb-10 bg-orange-50 p-6 rounded-xl border-l-4 border-orange-500 shadow-sm flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-orange-600">
-              Shop Settings Details
-            </h1>
-            <p className="text-sm text-orange-600 mt-2">
-              View complete information about your restaurant settings
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div
-              onClick={() => navigate(`/admin/settings/edit/${setting.id}`)}
-              className="px-6 py-2.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer font-medium"
-            >
-              Edit Setting
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Setting Details</h1>
+              <p className="text-sm text-gray-500 mt-1">View restaurant settings information</p>
             </div>
-            <div
-              onClick={() => navigate("/admin/settings")}
-              className="px-6 py-2.5 bg-orange-100 text-orange-600 rounded-lg hover:bg-orange-200 transition-colors cursor-pointer font-medium"
-            >
-              Back to List
+            <div className="flex gap-3">
+              <button
+                onClick={() => navigate(`/admin/settings/edit/${setting.id}`)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+              >
+                Edit Setting
+              </button>
+              <button
+                onClick={() => navigate("/admin/settings")}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200"
+              >
+                Back to Settings
+              </button>
             </div>
           </div>
         </div>
 
         {/* Details Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-orange-100 p-6">
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
           {/* Basic Information */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-orange-600 mb-4 pb-2 border-b border-orange-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
               Basic Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-xs font-medium text-orange-500 mb-1">
+                <label className="block text-xs font-medium text-gray-600 mb-1">
                   Setting ID
                 </label>
-                <div className="text-orange-700 font-medium">{setting.id}</div>
+                <div className="text-gray-900 font-medium">{setting.id}</div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-orange-500 mb-1">
+                <label className="block text-xs font-medium text-gray-600 mb-1">
                   Cafe Name
                 </label>
-                <div className="text-orange-700 font-medium text-lg">
+                <div className="text-gray-900 font-medium text-lg">
                   {setting.name}
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-orange-500 mb-1">
+                <label className="block text-xs font-medium text-gray-600 mb-1">
                   Contact Email
                 </label>
-                <div className="text-orange-700">{setting.contact_email}</div>
+                <div className="text-gray-900">{setting.contact_email}</div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-orange-500 mb-1">
+                <label className="block text-xs font-medium text-gray-600 mb-1">
                   Contact Phone
                 </label>
-                <div className="text-orange-700">{setting.contact_phone}</div>
+                <div className="text-gray-900">{setting.contact_phone}</div>
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-xs font-medium text-orange-500 mb-1">
+                <label className="block text-xs font-medium text-gray-600 mb-1">
                   Address
                 </label>
-                <div className="text-orange-700">{setting.address}</div>
+                <div className="text-gray-900">{setting.address}</div>
               </div>
 
               {setting.opening_hours && (
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-medium text-orange-500 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
                     Opening Hours
                   </label>
-                  <div className="text-orange-700">{setting.opening_hours}</div>
+                  <div className="text-gray-900">{setting.opening_hours}</div>
                 </div>
               )}
             </div>
@@ -144,12 +142,12 @@ const ViewSetting = () => {
 
           {/* Social Media */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-orange-600 mb-4 pb-2 border-b border-orange-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
               Social Media Links
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-xs font-medium text-orange-500 mb-1">
+                <label className="block text-xs font-medium text-gray-600 mb-1">
                   Facebook
                 </label>
                 {setting.facebook_url ? (
@@ -157,17 +155,17 @@ const ViewSetting = () => {
                     href={setting.facebook_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-orange-600 hover:text-orange-700 hover:underline"
+                    className="text-blue-600 hover:text-blue-700 hover:underline"
                   >
                     {setting.facebook_url}
                   </a>
                 ) : (
-                  <div className="text-orange-400">Not set</div>
+                  <div className="text-gray-400">Not set</div>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-orange-500 mb-1">
+                <label className="block text-xs font-medium text-gray-600 mb-1">
                   Instagram
                 </label>
                 {setting.instagram_url ? (
@@ -175,17 +173,17 @@ const ViewSetting = () => {
                     href={setting.instagram_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-orange-600 hover:text-orange-700 hover:underline"
+                    className="text-blue-600 hover:text-blue-700 hover:underline"
                   >
                     {setting.instagram_url}
                   </a>
                 ) : (
-                  <div className="text-orange-400">Not set</div>
+                  <div className="text-gray-400">Not set</div>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-orange-500 mb-1">
+                <label className="block text-xs font-medium text-gray-600 mb-1">
                   Twitter
                 </label>
                 {setting.twitter_url ? (
@@ -193,17 +191,17 @@ const ViewSetting = () => {
                     href={setting.twitter_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-orange-600 hover:text-orange-700 hover:underline"
+                    className="text-blue-600 hover:text-blue-700 hover:underline"
                   >
                     {setting.twitter_url}
                   </a>
                 ) : (
-                  <div className="text-orange-400">Not set</div>
+                  <div className="text-gray-400">Not set</div>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-orange-500 mb-1">
+                <label className="block text-xs font-medium text-gray-600 mb-1">
                   TikTok
                 </label>
                 {setting.tiktok_url ? (
@@ -211,33 +209,33 @@ const ViewSetting = () => {
                     href={setting.tiktok_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-orange-600 hover:text-orange-700 hover:underline"
+                    className="text-blue-600 hover:text-blue-700 hover:underline"
                   >
                     {setting.tiktok_url}
                   </a>
                 ) : (
-                  <div className="text-orange-400">Not set</div>
+                  <div className="text-gray-400">Not set</div>
                 )}
               </div>
             </div>
           </div>
 
           {/* Metadata */}
-          <div className="pt-4 border-t border-orange-200">
+          <div className="pt-4 border-t border-gray-200">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-orange-500 mb-1">
+                <label className="block text-xs font-medium text-gray-600 mb-1">
                   Created At
                 </label>
-                <div className="text-orange-700 text-sm">
+                <div className="text-gray-900 text-sm">
                   {new Date(setting.created_at).toLocaleString()}
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-orange-500 mb-1">
+                <label className="block text-xs font-medium text-gray-600 mb-1">
                   Last Updated
                 </label>
-                <div className="text-orange-700 text-sm">
+                <div className="text-gray-900 text-sm">
                   {new Date(setting.updated_at).toLocaleString()}
                 </div>
               </div>

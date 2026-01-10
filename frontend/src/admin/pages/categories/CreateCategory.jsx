@@ -54,15 +54,16 @@ const CreateCategory = () => {
   return (
     <AdminLayout>
       <div className="max-w-3xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Create Category</h1>
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Create Category</h1>
+          <p className="text-sm text-gray-500 mt-1">Add a new category</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category Name *
+              <label className="block text-sm font-medium text-gray-800 mb-2">
+                Category Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -70,13 +71,13 @@ const CreateCategory = () => {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Enter category name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Image URL
               </label>
               <input
@@ -84,13 +85,13 @@ const CreateCategory = () => {
                 name="image"
                 value={formData.image}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Enter image URL"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Sort Order
               </label>
               <input
@@ -99,7 +100,7 @@ const CreateCategory = () => {
                 value={formData.sort_order}
                 onChange={handleChange}
                 min="0"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="0"
               />
               <p className="text-sm text-gray-500 mt-1">
@@ -114,7 +115,7 @@ const CreateCategory = () => {
                 id="is_active"
                 checked={formData.is_active}
                 onChange={handleChange}
-                className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
               <label htmlFor="is_active" className="ml-2 text-sm font-medium text-gray-700">
                 Active
@@ -125,14 +126,14 @@ const CreateCategory = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400"
+                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"
               >
                 {loading ? 'Creating...' : 'Create Category'}
               </button>
               <button
                 type="button"
                 onClick={() => navigate('/admin/categories')}
-                className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"
+                className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>

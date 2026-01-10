@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AdminLayout from "../../components/AdminLayout";
+import ConfirmModal from "../../components/ConfirmModal";
 import toast from "react-hot-toast";
 
 const EditIngredient = () => {
@@ -8,6 +9,7 @@ const EditIngredient = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
     fetchIngredient();
@@ -44,8 +46,13 @@ const EditIngredient = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    if (loading) return;
+    setShowConfirm(true);
+  };
+
+  const handleConfirmUpdate = async () => {
     setLoading(true);
 
     const token = localStorage.getItem("admin_token");
@@ -86,23 +93,18 @@ const EditIngredient = () => {
 
   return (
     <AdminLayout>
-      <div className="max-w-3xl mx-auto space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Edit Ingredient</h1>
-          <button
-            onClick={() => navigate("/admin/ingredients")}
-            className="text-gray-600 hover:text-gray-900"
-          >
-            ← Back to List
-          </button>
+      <div className="max-w-3xl mx-auto">
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Edit Ingredient</h1>
+          <p className="text-sm text-gray-500 mt-1">Update ingredient information</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Ingredient Name *
+                <label className="block text-sm font-medium text-gray-800 mb-2">
+                  Ingredient Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -115,8 +117,8 @@ const EditIngredient = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Unit *
+                <label className="block text-sm font-medium text-gray-800 mb-2">
+                  Unit <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="unit"
@@ -137,7 +139,7 @@ const EditIngredient = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-800 mb-2">
                   Current Stock
                 </label>
                 <input
@@ -153,8 +155,8 @@ const EditIngredient = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Reorder Level *
+                <label className="block text-sm font-medium text-gray-800 mb-2">
+                  Reorder Level <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
@@ -171,7 +173,7 @@ const EditIngredient = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-800 mb-2">
                   Supplier Name
                 </label>
                 <input
@@ -184,7 +186,7 @@ const EditIngredient = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-800 mb-2">
                   Supplier Contact
                 </label>
                 <input
@@ -198,7 +200,7 @@ const EditIngredient = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Notes
               </label>
               <textarea
@@ -218,7 +220,7 @@ const EditIngredient = () => {
                 onChange={handleChange}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <label className="ml-2 block text-sm text-gray-900">
+              <label className="ml-2 block text-sm text-gray-800">
                 Active
               </label>
             </div>
@@ -234,7 +236,7 @@ const EditIngredient = () => {
               <button
                 type="button"
                 onClick={() => navigate("/admin/ingredients")}
-                className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="flex-1 bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>
@@ -242,6 +244,17 @@ const EditIngredient = () => {
           </form>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={handleConfirmUpdate}
+        title="Update Ingredient"
+        message="Are you sure you want to update this ingredient?"
+        confirmText="Update"
+        cancelText="Cancel"
+        type="warning"
+      />
     </AdminLayout>
   );
 };

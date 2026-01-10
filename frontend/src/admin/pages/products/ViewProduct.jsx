@@ -58,28 +58,33 @@ const ViewProduct = () => {
     <AdminLayout>
       <div className="p-6">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">Product Details</h1>
-          <div className="flex gap-3">
-            <button
-              onClick={() => navigate(`/admin/products/edit/${product.id}`)}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-            >
-              Edit Product
-            </button>
-            <button
-              onClick={() => navigate("/admin/products")}
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-            >
-              Back to Products
-            </button>
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Product Details</h1>
+              <p className="text-sm text-gray-500 mt-1">View product information and status</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => navigate(`/admin/products/edit/${product.id}`)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+              >
+                Edit Product
+              </button>
+              <button
+                onClick={() => navigate("/admin/products")}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200"
+              >
+                Back to Products
+              </button>
+            </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Info */}
-          <div className="lg:col-span-2 bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+          <div className="lg:col-span-2 rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Product Information
             </h2>
             
@@ -129,8 +134,8 @@ const ViewProduct = () => {
           {/* Status & Meta */}
           <div className="space-y-6">
             {/* Status Card */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">Status</h2>
+            <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Status</h2>
               
               <div className="space-y-3">
                 <div>
@@ -185,8 +190,8 @@ const ViewProduct = () => {
             </div>
 
             {/* Meta Info */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
                 Additional Info
               </h2>
               

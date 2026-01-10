@@ -44,7 +44,6 @@ class CustomerController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:customers',
-            'password' => 'required|string|min:8',
             'phone' => 'nullable|string|max:10',
             'address' => 'nullable|string|max:500',
         ]);
@@ -59,7 +58,6 @@ class CustomerController extends Controller
         $customer = Customer::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
             'phone' => $request->phone,
             'address' => $request->address,
         ]);

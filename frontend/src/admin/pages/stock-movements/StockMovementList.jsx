@@ -130,23 +130,28 @@ const StockMovementList = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="w-full">
         {/* Header */}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Stock Movements</h1>
-            <p className="text-gray-600 mt-1">Log stock IN (purchases) and OUT (usage/waste)</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+              Stock Movements
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Log stock IN (purchases) and OUT (usage/waste)
+            </p>
           </div>
+
           <div className="flex gap-3">
             <Link
               to="/admin/inventory"
-              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg"
+              className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium shadow-sm"
             >
               📊 View Dashboard
             </Link>
             <button
               onClick={() => setShowForm(!showForm)}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg"
+              className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium shadow-sm"
             >
               {showForm ? "✕ Cancel" : "+ Log Movement"}
             </button>
@@ -155,7 +160,7 @@ const StockMovementList = () => {
 
         {/* Log Form */}
         {showForm && (
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">Record Stock Movement</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -168,7 +173,7 @@ const StockMovementList = () => {
                     value={formData.ingredient_id}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select Ingredient</option>
                     {ingredients.map((ing) => (
@@ -188,7 +193,7 @@ const StockMovementList = () => {
                     value={formData.type}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="IN">📥 Stock IN (Purchase/Receive)</option>
                     <option value="OUT">📤 Stock OUT (Usage/Waste)</option>
@@ -207,7 +212,7 @@ const StockMovementList = () => {
                     required
                     min="0.01"
                     step="0.01"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -221,7 +226,7 @@ const StockMovementList = () => {
                     value={formData.movement_date}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -235,7 +240,7 @@ const StockMovementList = () => {
                   value={formData.note}
                   onChange={handleChange}
                   rows="2"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="e.g., Supplier invoice #123, Kitchen usage, Spoilage"
                 />
               </div>
@@ -243,7 +248,7 @@ const StockMovementList = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium disabled:opacity-50"
+                className="w-full px-5 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm disabled:opacity-50"
               >
                 {loading ? "Recording..." : "Record Movement"}
               </button>
@@ -252,35 +257,46 @@ const StockMovementList = () => {
         )}
 
         {/* Movements Table */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-xl font-bold text-gray-900">Recent Movements</h3>
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          {/* Top Bar */}
+          <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+            <p className="text-sm font-medium text-gray-900">
+              Recent Movements
+              <span className="text-gray-400 font-normal"> ({movements.length})</span>
+            </p>
+
+            <button
+              onClick={fetchMovements}
+              className="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700"
+            >
+              Refresh
+            </button>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+          <div className="w-full overflow-x-auto">
+            <table className="min-w-[900px] w-full">
               <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ingredient</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantity</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Note</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <tr className="text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
+                  <th className="px-5 py-3">Date</th>
+                  <th className="px-5 py-3">Ingredient</th>
+                  <th className="px-5 py-3">Type</th>
+                  <th className="px-5 py-3">Quantity</th>
+                  <th className="px-5 py-3">Note</th>
+                  <th className="px-5 py-3 text-center">Actions</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200">
                 {movements.map((movement) => (
-                  <tr key={movement.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <tr key={movement.id} className="hover:bg-gray-50">
+                    <td className="px-5 py-4 text-sm text-gray-900">
                       {new Date(movement.movement_date).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-5 py-4 text-sm font-medium text-gray-900">
                       {movement.ingredient?.name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-5 py-4">
                       <span
-                        className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        className={`px-3 py-1 text-xs font-semibold rounded-full ${
                           movement.type === "IN"
                             ? "bg-green-100 text-green-800"
                             : "bg-red-100 text-red-800"
@@ -289,7 +305,7 @@ const StockMovementList = () => {
                         {movement.type === "IN" ? "📥 IN" : "📤 OUT"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <td className="px-5 py-4">
                       <span
                         className={`text-sm font-bold ${
                           movement.type === "IN" ? "text-green-600" : "text-red-600"
@@ -299,16 +315,21 @@ const StockMovementList = () => {
                         {movement.quantity} {movement.ingredient?.unit}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                    <td className="px-5 py-4 text-sm text-gray-500">
                       {movement.note || "-"}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                      <button
-                        onClick={() => handleDelete(movement.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Delete
-                      </button>
+                    <td className="px-5 py-4">
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => handleDelete(movement.id)}
+                          className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 transition-colors"
+                          title="Delete"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

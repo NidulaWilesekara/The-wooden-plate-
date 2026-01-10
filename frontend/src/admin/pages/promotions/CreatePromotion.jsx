@@ -54,20 +54,20 @@ const CreatePromotion = () => {
     <AdminLayout>
       <div className="p-6 max-w-2xl mx-auto">
         {/* Header */}
-        <div className="mb-10 bg-gradient-to-r from-purple-50 to-purple-100 p-6 rounded-xl border-l-4 border-purple-500 shadow-sm">
-          <h1 className="text-3xl font-bold text-purple-600">Create Promotion</h1>
-          <p className="text-sm text-purple-600 mt-2">
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Create Promotion</h1>
+          <p className="text-sm text-gray-500 mt-1">
             Add a new promotion offer
           </p>
         </div>
 
         {/* Form */}
-        <div className="bg-white rounded-xl shadow-sm border border-purple-100 p-6">
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Title */}
             <div>
-              <label className="block text-sm font-medium text-purple-700 mb-2">
-                Promotion Title *
+              <label className="block text-sm font-medium text-gray-800 mb-2">
+                Promotion Title <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -75,22 +75,22 @@ const CreatePromotion = () => {
                 value={formData.title}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2.5 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-purple-900 bg-white"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
                 placeholder="e.g., Weekend Special"
               />
             </div>
 
             {/* Type */}
             <div>
-              <label className="block text-sm font-medium text-purple-700 mb-2">
-                Discount Type *
+              <label className="block text-sm font-medium text-gray-800 mb-2">
+                Discount Type <span className="text-red-500">*</span>
               </label>
               <select
                 name="type"
                 value={formData.type}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2.5 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-purple-900 bg-white"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
               >
                 <option value="percentage">Percentage (%)</option>
                 <option value="fixed">Fixed Amount ($)</option>
@@ -99,8 +99,8 @@ const CreatePromotion = () => {
 
             {/* Value */}
             <div>
-              <label className="block text-sm font-medium text-purple-700 mb-2">
-                Discount Value *
+              <label className="block text-sm font-medium text-gray-800 mb-2">
+                Discount Value <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -111,7 +111,7 @@ const CreatePromotion = () => {
                 min="0"
                 max={formData.type === "percentage" ? "100" : undefined}
                 step="0.01"
-                className="w-full px-4 py-2.5 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-purple-900 bg-white"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
                 placeholder={
                   formData.type === "percentage"
                     ? "e.g., 20 for 20%"
@@ -119,7 +119,7 @@ const CreatePromotion = () => {
                 }
               />
               {formData.type === "percentage" && (
-                <p className="text-xs text-purple-600 mt-1">
+                <p className="text-xs text-gray-500 mt-1">
                   Maximum value is 100%
                 </p>
               )}
@@ -127,7 +127,7 @@ const CreatePromotion = () => {
 
             {/* Start Date */}
             <div>
-              <label className="block text-sm font-medium text-purple-700 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Start Date & Time
               </label>
               <input
@@ -135,13 +135,13 @@ const CreatePromotion = () => {
                 name="starts_at"
                 value={formData.starts_at}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-purple-900 bg-white"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
               />
             </div>
 
             {/* End Date */}
             <div>
-              <label className="block text-sm font-medium text-purple-700 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 End Date & Time
               </label>
               <input
@@ -149,13 +149,13 @@ const CreatePromotion = () => {
                 name="ends_at"
                 value={formData.ends_at}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-purple-900 bg-white"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
               />
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-purple-700 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Description
               </label>
               <textarea
@@ -163,7 +163,7 @@ const CreatePromotion = () => {
                 value={formData.description}
                 onChange={handleChange}
                 rows="3"
-                className="w-full px-4 py-2.5 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-purple-900 bg-white"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-gray-900 bg-white"
                 placeholder="Enter promotion description"
               />
             </div>
@@ -175,9 +175,9 @@ const CreatePromotion = () => {
                 name="is_active"
                 checked={formData.is_active}
                 onChange={handleChange}
-                className="w-4 h-4 text-purple-600 border-purple-300 rounded focus:ring-purple-500"
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <label className="ml-2 text-sm font-medium text-purple-700">
+              <label className="ml-2 text-sm font-medium text-gray-700">
                 Activate this promotion immediately
               </label>
             </div>
@@ -187,10 +187,10 @@ const CreatePromotion = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`flex-1 px-6 py-2.5 bg-purple-500 text-white rounded-lg font-medium transition-colors ${
+                className={`flex-1 px-6 py-2.5 bg-blue-600 text-white rounded-lg font-medium transition-colors ${
                   loading
                     ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-purple-600"
+                    : "hover:bg-blue-700"
                 }`}
               >
                 {loading ? "Creating..." : "Create Promotion"}
@@ -198,7 +198,7 @@ const CreatePromotion = () => {
               <button
                 type="button"
                 onClick={() => navigate("/admin/promotions")}
-                className="flex-1 px-6 py-2.5 bg-purple-100 text-purple-600 rounded-lg font-medium hover:bg-purple-200 transition-colors"
+                className="flex-1 px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>

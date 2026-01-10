@@ -32,14 +32,7 @@ export const CustomerAuthProvider = ({ children }) => {
     const register = async (userData) => {
         try {
             const response = await axios.post('/api/public/register', userData);
-            const { customer: newCustomer, token: newToken } = response.data;
-
-            setCustomer(newCustomer);
-            setToken(newToken);
-            localStorage.setItem('customerToken', newToken);
-            localStorage.setItem('customer', JSON.stringify(newCustomer));
-            axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-
+            
             return { success: true, data: response.data };
         } catch (error) {
             return {
@@ -50,9 +43,22 @@ export const CustomerAuthProvider = ({ children }) => {
         }
     };
 
-    const login = async (credentials) => {
+    const sendOTP = async ({ email }) => {
         try {
-            const response = await axios.post('/api/public/login', credentials);
+            const response = await axios.post('/api/public/send-otp', { email });
+            return { success: true, data: response.data };
+        } catch (error) {
+            return {
+                success: false,
+                message: error.response?.data?.message || 'Failed to send OTP',
+                errors: error.response?.data?.errors
+            };
+        }
+    };
+
+    const verifyOTP = async ({ email, otp }) => {
+        try {
+            const response = await axios.post('/api/public/verify-otp', { email, otp });
             const { customer: loggedInCustomer, token: newToken } = response.data;
 
             setCustomer(loggedInCustomer);
@@ -65,10 +71,15 @@ export const CustomerAuthProvider = ({ children }) => {
         } catch (error) {
             return {
                 success: false,
-                message: error.response?.data?.message || 'Login failed',
+                message: error.response?.data?.message || 'Invalid OTP',
                 errors: error.response?.data?.errors
             };
         }
+    };
+
+    const login = async (credentials) => {
+        // Deprecated - keeping for backward compatibility
+        return sendOTP(credentials);
     };
 
     const logout = async () => {
@@ -87,32 +98,6 @@ export const CustomerAuthProvider = ({ children }) => {
         }
     };
 
-    const forgotPassword = async (email) => {
-        try {
-            const response = await axios.post('/api/public/forgot-password', { email });
-            return { success: true, data: response.data };
-        } catch (error) {
-            return {
-                success: false,
-                message: error.response?.data?.message || 'Failed to send reset link',
-                errors: error.response?.data?.errors
-            };
-        }
-    };
-
-    const resetPassword = async (resetData) => {
-        try {
-            const response = await axios.post('/api/public/reset-password', resetData);
-            return { success: true, data: response.data };
-        } catch (error) {
-            return {
-                success: false,
-                message: error.response?.data?.message || 'Password reset failed',
-                errors: error.response?.data?.errors
-            };
-        }
-    };
-
     const isAuthenticated = () => {
         return !!token && !!customer;
     };
@@ -122,10 +107,10 @@ export const CustomerAuthProvider = ({ children }) => {
         token,
         loading,
         register,
+        sendOTP,
+        verifyOTP,
         login,
         logout,
-        forgotPassword,
-        resetPassword,
         isAuthenticated
     };
 

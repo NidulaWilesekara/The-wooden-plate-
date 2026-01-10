@@ -255,8 +255,10 @@ class ReportController extends Controller
         $newCustomers = Customer::whereBetween('created_at', [$startDate, $endDate])->count();
 
         // Repeat customers (those with more than 1 order)
-        $repeatCustomers = Customer::whereHas('orders', function ($query) {
-            $query->selectRaw('customer_id, COUNT(*) as order_count')
+        $repeatCustomers = Customer::whereIn('id', function ($query) {
+            $query->select('customer_id')
+                ->from('orders')
+                ->whereNotNull('customer_id')
                 ->groupBy('customer_id')
                 ->havingRaw('COUNT(*) > 1');
         })->count();

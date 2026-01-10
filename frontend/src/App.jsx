@@ -1,5 +1,6 @@
 import './App.css'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
 import { CartProvider } from './customer/context/CartContext.jsx'
 import { CustomerAuthProvider } from './contexts/CustomerAuthContext.jsx'
 
@@ -14,8 +15,6 @@ import OrderTrackingPage from './customer/pages/OrderTrackingPage.jsx'
 // Customer Auth Pages
 import LoginPage from './pages/LoginPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
-import ForgotPasswordPage from './pages/ForgotPasswordPage.jsx'
-import ResetPasswordPage from './pages/ResetPasswordPage.jsx'
 import MyOrdersPage from './pages/MyOrdersPage.jsx'
 
 // Admin Pages
@@ -84,6 +83,35 @@ function App() {
   return (
     <CustomerAuthProvider>
       <CartProvider>
+        <Toaster
+          position="top-center"
+          gutter={10}
+          containerStyle={{
+            top: 88,
+            left: 0,
+            right: 0,
+            zIndex: 999999,
+          }}
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: "#111827",
+              color: "#fff",
+              borderRadius: "12px",
+              padding: "12px 14px",
+              boxShadow:
+                "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)",
+            },
+            success: {
+              style: { background: "#16a34a" },
+              iconTheme: { primary: "#fff", secondary: "#16a34a" },
+            },
+            error: {
+              style: { background: "#dc2626" },
+              iconTheme: { primary: "#fff", secondary: "#dc2626" },
+            },
+          }}
+        />
         <Routes>
           {/* Customer Routes (Public) */}
           <Route path="/" element={<HomePage />} />
@@ -96,8 +124,6 @@ function App() {
           {/* Customer Auth Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/my-orders" element={<MyOrdersPage />} />
         
         {/* Admin Routes */}

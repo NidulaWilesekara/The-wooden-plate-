@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/AdminLayout';
+import ConfirmModal from '../../components/ConfirmModal';
 import toast from 'react-hot-toast';
 
 const EditCategory = () => {
@@ -14,6 +15,7 @@ const EditCategory = () => {
   });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
     fetchCategory();
@@ -53,8 +55,13 @@ const EditCategory = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    if (submitting) return;
+    setShowConfirm(true);
+  };
+
+  const handleConfirmUpdate = async () => {
     setSubmitting(true);
 
     try {
@@ -71,7 +78,7 @@ const EditCategory = () => {
 
       const data = await response.json();
       if (data.success) {
-        toast.success(data.message);
+        toast.success("Category updated successfully");
         navigate('/admin/categories');
       } else {
         toast.error('Failed to update category');
@@ -96,15 +103,16 @@ const EditCategory = () => {
   return (
     <AdminLayout>
       <div className="max-w-3xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Edit Category</h1>
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Edit Category</h1>
+          <p className="text-sm text-gray-500 mt-1">Update category information</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category Name *
+              <label className="block text-sm font-medium text-gray-800 mb-2">
+                Category Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -112,13 +120,13 @@ const EditCategory = () => {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Enter category name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Image URL
               </label>
               <input
@@ -126,13 +134,13 @@ const EditCategory = () => {
                 name="image"
                 value={formData.image}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Enter image URL"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Sort Order
               </label>
               <input
@@ -141,7 +149,7 @@ const EditCategory = () => {
                 value={formData.sort_order}
                 onChange={handleChange}
                 min="0"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="0"
               />
               <p className="text-sm text-gray-500 mt-1">
@@ -156,9 +164,9 @@ const EditCategory = () => {
                 id="is_active"
                 checked={formData.is_active}
                 onChange={handleChange}
-                className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <label htmlFor="is_active" className="ml-2 text-sm font-medium text-gray-700">
+              <label htmlFor="is_active" className="ml-2 text-sm font-medium text-gray-800">
                 Active
               </label>
             </div>
@@ -167,14 +175,14 @@ const EditCategory = () => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400"
+                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"
               >
                 {submitting ? 'Updating...' : 'Update Category'}
               </button>
               <button
                 type="button"
                 onClick={() => navigate('/admin/categories')}
-                className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"
+                className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>
@@ -182,6 +190,17 @@ const EditCategory = () => {
           </form>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={handleConfirmUpdate}
+        title="Update Category"
+        message="Are you sure you want to update this category?"
+        confirmText="Update"
+        cancelText="Cancel"
+        type="warning"
+      />
     </AdminLayout>
   );
 };

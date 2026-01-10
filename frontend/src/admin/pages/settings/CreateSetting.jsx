@@ -58,26 +58,26 @@ const CreateSetting = () => {
     <AdminLayout>
       <div className="p-6">
         {/* Header */}
-        <div className="mb-10 bg-gradient-to-r from-orange-50 to-orange-100 p-6 rounded-xl border-l-4 border-orange-500 shadow-sm">
-          <h1 className="text-3xl font-bold text-orange-600">
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
             Create Shop Settings
           </h1>
-          <p className="text-sm text-orange-600 mt-2">
+          <p className="text-sm text-gray-500 mt-1">
             Enter your restaurant details and information
           </p>
         </div>
 
         {/* Form */}
-        <div className="bg-white rounded-xl shadow-sm border border-orange-100 p-6">
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
           <form onSubmit={handleSubmit}>
             {/* Basic Information */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-orange-600 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Basic Information
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Cafe Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -86,13 +86,13 @@ const CreateSetting = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="The Wooden Plate"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Contact Email <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -101,13 +101,13 @@ const CreateSetting = () => {
                     value={formData.contact_email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="info@woodenplate.com"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Contact Phone <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -116,13 +116,13 @@ const CreateSetting = () => {
                     value={formData.contact_phone}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="+94 123 456 789"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Opening Hours
                   </label>
                   <input
@@ -130,13 +130,13 @@ const CreateSetting = () => {
                     name="opening_hours"
                     value={formData.opening_hours}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="Mon-Sun: 10:00 AM - 10:00 PM"
                   />
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Address <span className="text-red-500">*</span>
                   </label>
                   <textarea
@@ -145,7 +145,7 @@ const CreateSetting = () => {
                     onChange={handleChange}
                     required
                     rows="2"
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="123 Main Street, Colombo, Sri Lanka"
                   />
                 </div>
@@ -154,12 +154,12 @@ const CreateSetting = () => {
 
             {/* Social Media */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-orange-600 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Social Media Links
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Facebook URL
                   </label>
                   <input
@@ -167,13 +167,13 @@ const CreateSetting = () => {
                     name="facebook_url"
                     value={formData.facebook_url}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="https://facebook.com/yourpage"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Instagram URL
                   </label>
                   <input
@@ -181,13 +181,13 @@ const CreateSetting = () => {
                     name="instagram_url"
                     value={formData.instagram_url}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="https://instagram.com/yourpage"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Twitter URL
                   </label>
                   <input
@@ -195,13 +195,13 @@ const CreateSetting = () => {
                     name="twitter_url"
                     value={formData.twitter_url}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="https://twitter.com/yourpage"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     TikTok URL
                   </label>
                   <input
@@ -209,7 +209,7 @@ const CreateSetting = () => {
                     name="tiktok_url"
                     value={formData.tiktok_url}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="https://tiktok.com/@yourpage"
                   />
                 </div>
@@ -218,20 +218,22 @@ const CreateSetting = () => {
 
             {/* Buttons */}
             <div className="flex items-center gap-3 pt-4">
-              <div
-                onClick={handleSubmit}
-                className={`px-6 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors cursor-pointer font-medium ${
+              <button
+                type="submit"
+                disabled={loading}
+                className={`px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium ${
                   loading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
                 {loading ? "Creating..." : "Create Setting"}
-              </div>
-              <div
+              </button>
+              <button
+                type="button"
                 onClick={() => navigate("/admin/settings")}
-                className="px-6 py-2.5 bg-orange-100 text-orange-600 rounded-lg hover:bg-orange-200 transition-colors cursor-pointer font-medium"
+                className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
               >
                 Cancel
-              </div>
+              </button>
             </div>
           </form>
         </div>

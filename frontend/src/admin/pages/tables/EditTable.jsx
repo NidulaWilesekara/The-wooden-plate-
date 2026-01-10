@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AdminLayout from "../../components/AdminLayout";
+import ConfirmModal from "../../components/ConfirmModal";
 import toast from "react-hot-toast";
 
 const EditTable = () => {
@@ -14,6 +15,7 @@ const EditTable = () => {
   });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
     fetchTable();
@@ -53,8 +55,13 @@ const EditTable = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    if (submitting) return;
+    setShowConfirm(true);
+  };
+
+  const handleConfirmUpdate = async () => {
     setSubmitting(true);
 
     try {
@@ -71,7 +78,7 @@ const EditTable = () => {
 
       const data = await response.json();
       if (data.success) {
-        toast.success(data.message);
+        toast.success("Table updated successfully");
         navigate("/admin/tables");
       } else {
         toast.error("Failed to update table");
@@ -96,15 +103,16 @@ const EditTable = () => {
   return (
     <AdminLayout>
       <div className="max-w-3xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Edit Table</h1>
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Edit Table</h1>
+          <p className="text-sm text-gray-500 mt-1">Update table information</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Table Number *
+              <label className="block text-sm font-medium text-gray-800 mb-2">
+                Table Number <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -118,8 +126,8 @@ const EditTable = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Number of Chairs *
+              <label className="block text-sm font-medium text-gray-800 mb-2">
+                Number of Chairs <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -135,7 +143,7 @@ const EditTable = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Notes
               </label>
               <textarea
@@ -157,7 +165,7 @@ const EditTable = () => {
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <label htmlFor="is_active" className="ml-2 text-sm font-medium text-gray-700">
+              <label htmlFor="is_active" className="ml-2 text-sm font-medium text-gray-800">
                 Active (available for reservations)
               </label>
             </div>
@@ -173,7 +181,7 @@ const EditTable = () => {
               <button
                 type="button"
                 onClick={() => navigate("/admin/tables")}
-                className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"
+                className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>
@@ -181,6 +189,17 @@ const EditTable = () => {
           </form>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={handleConfirmUpdate}
+        title="Update Table"
+        message="Are you sure you want to update this table?"
+        confirmText="Update"
+        cancelText="Cancel"
+        type="warning"
+      />
     </AdminLayout>
   );
 };

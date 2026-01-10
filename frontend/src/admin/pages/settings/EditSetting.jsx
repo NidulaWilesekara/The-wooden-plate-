@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminLayout from "../../components/AdminLayout";
+import ConfirmModal from "../../components/ConfirmModal";
 import toast from "react-hot-toast";
 
 const EditSetting = () => {
@@ -8,6 +9,7 @@ const EditSetting = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     contact_email: "",
@@ -66,8 +68,13 @@ const EditSetting = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    if (loading) return;
+    setShowConfirm(true);
+  };
+
+  const handleConfirmUpdate = async () => {
     setLoading(true);
 
     try {
@@ -89,7 +96,7 @@ const EditSetting = () => {
         throw new Error(errorData.message || "Failed to update setting");
       }
 
-      toast.success("Setting updated successfully!");
+      toast.success("Setting updated successfully");
       navigate("/admin/settings");
     } catch (error) {
       toast.error(error.message || "Failed to update setting");
@@ -110,28 +117,26 @@ const EditSetting = () => {
 
   return (
     <AdminLayout>
-      <div className="p-6">
-        {/* Header */}
-        <div className="mb-10 bg-gradient-to-r from-orange-50 to-orange-100 p-6 rounded-xl border-l-4 border-orange-500 shadow-sm">
-          <h1 className="text-3xl font-bold text-orange-600">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
             Edit Shop Settings
           </h1>
-          <p className="text-sm text-orange-600 mt-2">
+          <p className="text-sm text-gray-500 mt-1">
             Update your restaurant details and information
           </p>
         </div>
 
-        {/* Form */}
-        <div className="bg-white rounded-xl shadow-sm border border-orange-100 p-6">
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
           <form onSubmit={handleSubmit}>
             {/* Basic Information */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-orange-600 mb-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
                 Basic Information
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Cafe Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -140,13 +145,13 @@ const EditSetting = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="The Wooden Plate"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Contact Email <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -155,13 +160,13 @@ const EditSetting = () => {
                     value={formData.contact_email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="info@woodenplate.com"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Contact Phone <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -170,13 +175,13 @@ const EditSetting = () => {
                     value={formData.contact_phone}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="+94 123 456 789"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Opening Hours
                   </label>
                   <input
@@ -184,13 +189,13 @@ const EditSetting = () => {
                     name="opening_hours"
                     value={formData.opening_hours}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="Mon-Sun: 10:00 AM - 10:00 PM"
                   />
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Address <span className="text-red-500">*</span>
                   </label>
                   <textarea
@@ -199,7 +204,7 @@ const EditSetting = () => {
                     onChange={handleChange}
                     required
                     rows="2"
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="123 Main Street, Colombo, Sri Lanka"
                   />
                 </div>
@@ -208,12 +213,12 @@ const EditSetting = () => {
 
             {/* Social Media */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-orange-600 mb-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
                 Social Media Links
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Facebook URL
                   </label>
                   <input
@@ -221,13 +226,13 @@ const EditSetting = () => {
                     name="facebook_url"
                     value={formData.facebook_url}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="https://facebook.com/yourpage"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Instagram URL
                   </label>
                   <input
@@ -235,13 +240,13 @@ const EditSetting = () => {
                     name="instagram_url"
                     value={formData.instagram_url}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="https://instagram.com/yourpage"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     Twitter URL
                   </label>
                   <input
@@ -249,13 +254,13 @@ const EditSetting = () => {
                     name="twitter_url"
                     value={formData.twitter_url}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="https://twitter.com/yourpage"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-orange-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     TikTok URL
                   </label>
                   <input
@@ -263,7 +268,7 @@ const EditSetting = () => {
                     name="tiktok_url"
                     value={formData.tiktok_url}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none text-orange-900 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                     placeholder="https://tiktok.com/@yourpage"
                   />
                 </div>
@@ -271,25 +276,37 @@ const EditSetting = () => {
             </div>
 
             {/* Buttons */}
-            <div className="flex items-center gap-3 pt-4">
-              <div
+            <div className="flex gap-4 pt-4">
+              <button
+                type="submit"
                 onClick={handleSubmit}
-                className={`px-6 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors cursor-pointer font-medium ${
-                  loading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                disabled={loading}
+                className="flex-1 bg-blue-600 text-white py-2.5 px-6 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 font-medium"
               >
                 {loading ? "Updating..." : "Update Setting"}
-              </div>
-              <div
+              </button>
+              <button
+                type="button"
                 onClick={() => navigate("/admin/settings")}
-                className="px-6 py-2.5 bg-orange-100 text-orange-600 rounded-lg hover:bg-orange-200 transition-colors cursor-pointer font-medium"
+                className="flex-1 bg-gray-100 text-gray-700 py-2.5 px-6 rounded-lg hover:bg-gray-200 transition-colors font-medium"
               >
                 Cancel
-              </div>
+              </button>
             </div>
           </form>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={handleConfirmUpdate}
+        title="Update Settings"
+        message="Are you sure you want to update these settings?"
+        confirmText="Update"
+        cancelText="Cancel"
+        type="warning"
+      />
     </AdminLayout>
   );
 };

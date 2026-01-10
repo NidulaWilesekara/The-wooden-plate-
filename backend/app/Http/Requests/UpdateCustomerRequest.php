@@ -22,12 +22,20 @@ class UpdateCustomerRequest extends FormRequest
     public function rules(): array
     {
         $customerId = $this->route('customer');
-        
+
         return [
             'name'    => 'sometimes|required|string|max:255',
             'email'   => 'sometimes|required|email|unique:customers,email,' . $customerId,
-            'phone'   => 'nullable|string|max:20',
+            'phone'   => 'nullable|string|max:20|unique:customers,phone,' . $customerId,
             'address' => 'nullable|string|max:255',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'email.unique' => 'This email is already used by another customer.',
+            'phone.unique' => 'This phone number is already used by another customer.',
         ];
     }
 }

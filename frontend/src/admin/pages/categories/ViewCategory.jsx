@@ -81,32 +81,31 @@ const ViewCategory = () => {
 
   return (
     <AdminLayout>
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Category Details</h1>
-          <div className="flex gap-2">
-            <button
-              onClick={() => navigate(`/admin/categories/${id}/edit`)}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-            >
-              Edit
-            </button>
-            <button
-              onClick={handleDelete}
-              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
-            >
-              Delete
-            </button>
-            <button
-              onClick={() => navigate('/admin/categories')}
-              className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
-            >
-              Back
-            </button>
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Category Details</h1>
+              <p className="text-sm text-gray-500 mt-1">View category information</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => navigate(`/admin/categories/${id}/edit`)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+              >
+                Edit Category
+              </button>
+              <button
+                onClick={() => navigate('/admin/categories')}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200"
+              >
+                Back to Categories
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
           {category.image && (
             <div className="h-48 bg-gray-200">
               <img

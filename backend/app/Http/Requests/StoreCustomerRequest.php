@@ -24,8 +24,16 @@ class StoreCustomerRequest extends FormRequest
         return [
             'name'    => 'required|string|max:255',
             'email'   => 'required|email|unique:customers,email',
-            'phone'   => 'nullable|string|max:20',
+            'phone'   => 'nullable|string|max:20|unique:customers,phone',
             'address' => 'nullable|string|max:255',
         ];
     }
+
+    public function messages()
+{
+    return [
+        'email.unique' => 'This email is already used.',
+        'phone.unique' => 'This phone number is already used.',
+    ];
+}
 }

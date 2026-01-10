@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCustomerAuth } from '../contexts/CustomerAuthContext';
+import toast from 'react-hot-toast';
 
 const RegisterPage = () => {
     const navigate = useNavigate();
@@ -8,8 +9,6 @@ const RegisterPage = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
-        password: '',
-        password_confirmation: '',
         phone: '',
         address: ''
     });
@@ -35,9 +34,15 @@ const RegisterPage = () => {
         const result = await register(formData);
 
         if (result.success) {
-            navigate('/my-orders');
+            toast.success('Registration successful! Please check your email for OTP.');
+            navigate('/login', { state: { email: formData.email } });
         } else {
-            setErrors(result.errors || { general: result.message });
+            if (result.errors) {
+                setErrors(result.errors);
+                Object.values(result.errors).flat().forEach(msg => toast.error(msg));
+            } else {
+                toast.error(result.message);
+            }
         }
         setLoading(false);
     };
@@ -136,43 +141,12 @@ const RegisterPage = () => {
                                 <p className="mt-1 text-sm text-red-600">{errors.address[0]}</p>
                             )}
                         </div>
+                    </div>
 
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                Password *
-                            </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                required
-                                value={formData.password}
-                                onChange={handleChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                                placeholder="••••••••"
-                                minLength="8"
-                            />
-                            {errors.password && (
-                                <p className="mt-1 text-sm text-red-600">{errors.password[0]}</p>
-                            )}
-                        </div>
-
-                        <div>
-                            <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-700">
-                                Confirm Password *
-                            </label>
-                            <input
-                                id="password_confirmation"
-                                name="password_confirmation"
-                                type="password"
-                                required
-                                value={formData.password_confirmation}
-                                onChange={handleChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                                placeholder="••••••••"
-                                minLength="8"
-                            />
-                        </div>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <p className="text-sm text-blue-800">
+                            📧 After registration, you'll receive an OTP via email to login.
+                        </p>
                     </div>
 
                     <div>
