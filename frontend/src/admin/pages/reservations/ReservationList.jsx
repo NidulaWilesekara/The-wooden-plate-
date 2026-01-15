@@ -107,13 +107,6 @@ const ReservationList = () => {
               Manage customer table reservations
             </p>
           </div>
-
-          <button
-            onClick={() => navigate("/admin/tables")}
-            className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium shadow-sm"
-          >
-            Manage Tables
-          </button>
         </div>
 
         {/* Stats */}

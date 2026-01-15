@@ -17,10 +17,17 @@ class UpdateMenuItemRequest extends FormRequest
             'category_id' => 'sometimes|required|exists:categories,id',
             'name' => 'sometimes|required|string|max:255',
             'price' => 'sometimes|required|numeric|min:0',
-            'image' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'description' => 'nullable|string',
-            'is_available' => 'nullable|boolean'
+            'is_available' => 'nullable'
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'is_available' => filter_var($this->is_available, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true,
+        ]);
     }
 
     public function messages(): array

@@ -15,10 +15,17 @@ class StoreCategoryRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'image' => 'nullable|string|max:255',
-            'is_active' => 'nullable|boolean',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'is_active' => 'nullable',
             'sort_order' => 'nullable|integer|min:0'
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'is_active' => filter_var($this->is_active, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true,
+        ]);
     }
 
     public function messages(): array

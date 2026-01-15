@@ -7,6 +7,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class ProductAPIController extends Controller
@@ -63,7 +64,15 @@ class ProductAPIController extends Controller
     public function store(StoreProductRequest $request)
     {
         try {
-            $product = Product::create($request->validated());
+            $data = $request->validated();
+
+            // Handle file upload
+            if ($request->hasFile('image')) {
+                $path = $request->file('image')->store('products', 'public');
+                $data['image'] = $path;
+            }
+
+            $product = Product::create($data);
 
             return response()->json([
                 'success' => true,
@@ -92,7 +101,19 @@ class ProductAPIController extends Controller
     public function update(UpdateProductRequest $request, Product $product)
     {
         try {
-            $product->update($request->validated());
+            $data = $request->validated();
+
+            // Handle file upload
+            if ($request->hasFile('image')) {
+                // Delete old image if exists
+                if ($product->image && Storage::disk('public')->exists($product->image)) {
+                    Storage::disk('public')->delete($product->image);
+                }
+                $path = $request->file('image')->store('products', 'public');
+                $data['image'] = $path;
+            }
+
+            $product->update($data);
 
             return response()->json([
                 'success' => true,
@@ -112,6 +133,11 @@ class ProductAPIController extends Controller
     public function destroy(Product $product)
     {
         try {
+            // Delete image if exists
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
+
             $product->delete();
 
             return response()->json([

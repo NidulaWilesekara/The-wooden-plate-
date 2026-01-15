@@ -24,13 +24,22 @@ class StoreProductRequest extends FormRequest
         return [
             'name'         => 'required|string|max:255',
             'price'        => 'required|numeric|min:0',
-            'image'        => 'nullable|string|max:255', // later file upload
+            'image'        => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'description'  => 'nullable|string',
             'category'     => 'nullable|string|max:100',
 
-            'is_available' => 'nullable|boolean',
-            'is_featured'  => 'nullable|boolean',
-            'is_new'       => 'nullable|boolean',
+            'is_available' => 'nullable',
+            'is_featured'  => 'nullable',
+            'is_new'       => 'nullable',
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'is_available' => filter_var($this->is_available, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true,
+            'is_featured' => filter_var($this->is_featured, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false,
+            'is_new' => filter_var($this->is_new, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false,
+        ]);
     }
 }

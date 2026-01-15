@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/AdminLayout';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -7,77 +7,79 @@ import toast from 'react-hot-toast';
 const EditMenuItem = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     category_id: '',
     name: '',
     price: '',
-    image: '',
     description: '',
     is_available: true,
   });
+
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [existingImage, setExistingImage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const token = localStorage.getItem('admin_token');
+
   useEffect(() => {
-    fetchCategories();
-    fetchMenuItem();
-  }, [id]);
-
-  const fetchCategories = async () => {
-    try {
-      const token = localStorage.getItem('admin_token');
-      const response = await fetch('http://localhost:8000/api/admin/categories', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json',
-        },
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        setCategories(data.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch categories');
-    }
-  };
-
-  const fetchMenuItem = async () => {
-    try {
-      const token = localStorage.getItem('admin_token');
-      const response = await fetch(`http://localhost:8000/api/admin/menu-items/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json',
-        },
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        setFormData({
-          category_id: data.data.category_id,
-          name: data.data.name,
-          price: data.data.price,
-          image: data.data.image || '',
-          description: data.data.description || '',
-          is_available: data.data.is_available,
+    const fetchData = async () => {
+      try {
+        // Fetch categories
+        const catRes = await fetch('http://localhost:8000/api/admin/categories', {
+          headers: { Authorization: `Bearer ${token}` },
         });
+        const catData = await catRes.json();
+        setCategories(catData.data || []);
+
+        // Fetch menu item
+        const itemRes = await fetch(`http://localhost:8000/api/admin/menu-items/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!itemRes.ok) throw new Error('Failed to fetch menu item');
+        const itemData = await itemRes.json();
+        setFormData({
+          category_id: itemData.data.category_id || '',
+          name: itemData.data.name || '',
+          price: itemData.data.price || '',
+          description: itemData.data.description || '',
+          is_available: itemData.data.is_available ?? true,
+        });
+        if (itemData.data.image) {
+          setExistingImage(itemData.data.image);
+        }
+      } catch (e) {
+        toast.error('Failed to load data');
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      toast.error('Failed to fetch menu item');
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchData();
+  }, [id, token]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
+    setFormData((p) => ({
+      ...p,
       [name]: type === 'checkbox' ? checked : value,
     }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -88,28 +90,43 @@ const EditMenuItem = () => {
 
   const handleConfirmUpdate = async () => {
     setSubmitting(true);
+    setShowConfirm(false);
 
     try {
-      const token = localStorage.getItem('admin_token');
-      const response = await fetch(`http://localhost:8000/api/admin/menu-items/${id}`, {
-        method: 'PUT',
+      const submitData = new FormData();
+      submitData.append('category_id', formData.category_id);
+      submitData.append('name', formData.name);
+      submitData.append('price', formData.price);
+      submitData.append('description', formData.description || '');
+      submitData.append('is_available', formData.is_available ? '1' : '0');
+      submitData.append('_method', 'PUT');
+      if (imageFile) {
+        submitData.append('image', imageFile);
+      }
+
+      const res = await fetch(`http://localhost:8000/api/admin/menu-items/${id}`, {
+        method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: submitData,
       });
 
-      const data = await response.json();
-      if (data.success) {
-        toast.success("Menu item updated successfully");
-        navigate('/admin/menu-items');
-      } else {
-        toast.error('Failed to update menu item');
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 422 && data.errors) {
+          const errorMessages = Object.values(data.errors).flat();
+          errorMessages.forEach((msg) => toast.error(msg));
+          return;
+        }
+        throw new Error(data.message || 'Failed to update menu item');
       }
-    } catch (error) {
-      toast.error('An error occurred');
+
+      toast.success('Menu item updated successfully');
+      navigate('/admin/menu-items');
+    } catch (err) {
+      toast.error(err.message || 'Failed to update menu item');
     } finally {
       setSubmitting(false);
     }
@@ -118,8 +135,8 @@ const EditMenuItem = () => {
   if (loading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-xl text-gray-600">Loading...</div>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <span className="text-gray-400 animate-pulse">Loading...</span>
         </div>
       </AdminLayout>
     );
@@ -127,125 +144,212 @@ const EditMenuItem = () => {
 
   return (
     <AdminLayout>
-      <div className="max-w-3xl mx-auto">
-        <div className="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Edit Menu Item</h1>
-          <p className="text-sm text-gray-500 mt-1">Update menu item information</p>
-        </div>
+      <div className="flex-1 py-8">
+        <div className="w-full md:px-8 px-4">
+          {/* ✅ HERO HEADER */}
+          <div className="mb-6">
+            <div className="w-full rounded-xl border border-gray-200 bg-gray-100 px-6 py-5 shadow-sm">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                    Edit Menu Item
+                  </h1>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Update details for <span className="font-medium">{formData.name}</span>
+                  </p>
+                </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-2">
-                Category <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="category_id"
-                value={formData.category_id}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Select a category</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={() => navigate('/admin/menu-items')}
+                    className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg
+                               bg-white hover:bg-gray-50 border border-gray-200
+                               text-gray-800 text-sm font-medium transition cursor-pointer"
+                  >
+                    ← Back to List
+                  </button>
+
+                  <button
+                    onClick={() => navigate(`/admin/menu-items/${id}`)}
+                    className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg
+                               bg-blue-600 hover:bg-blue-700
+                               text-white text-sm font-medium transition cursor-pointer"
+                  >
+                    View Menu Item
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ✅ FORM CARD */}
+          <div className="w-full rounded-2xl border border-gray-200 bg-white shadow-sm">
+            {/* form header */}
+            <div className="px-6 py-5 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">Menu Item Information</h2>
+              <p className="text-sm text-gray-500 mt-1">Update fields and click "Update".</p>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-2">
-                Item Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter item name"
-              />
-            </div>
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              {/* GRID */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Category */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                    Category <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="category_id"
+                    value={formData.category_id}
+                    onChange={handleChange}
+                    required
+                    className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-gray-900
+                               focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-2">
-                Price (Rs.) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                name="price"
-                value={formData.price}
-                onChange={handleChange}
-                required
-                min="0"
-                step="0.01"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="0.00"
-              />
-            </div>
+                {/* Name */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                    Item Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    placeholder="Enter item name"
+                    className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-gray-900
+                               focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-2">
-                Image URL
-              </label>
-              <input
-                type="text"
-                name="image"
-                value={formData.image}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter image URL"
-              />
-            </div>
+                {/* Price */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                    Price (Rs.) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleChange}
+                    required
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-gray-900
+                               focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-2">
-                Description
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                rows="4"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter item description"
-              />
-            </div>
+                {/* Image Upload */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                    Item Image
+                  </label>
+                  <div className="space-y-3">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-gray-900
+                                 focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-1 file:px-3
+                                 file:rounded-md file:border-0 file:text-sm file:font-medium
+                                 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    />
+                    {(imagePreview || existingImage) && (
+                      <div className="relative w-32 h-32">
+                        <img
+                          src={imagePreview || (existingImage?.startsWith('http') ? existingImage : `http://localhost:8000/storage/${existingImage}`)}
+                          alt="Preview"
+                          className="w-32 h-32 object-cover rounded-lg border border-gray-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setImageFile(null);
+                            setImagePreview(null);
+                            setExistingImage(null);
+                          }}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
 
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                name="is_available"
-                id="is_available"
-                checked={formData.is_available}
-                onChange={handleChange}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <label htmlFor="is_available" className="ml-2 text-sm font-medium text-gray-800">
-                Available
-              </label>
-            </div>
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  rows={3}
+                  placeholder="Enter item description"
+                  className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-gray-900
+                             focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                />
+              </div>
 
-            <div className="flex gap-4">
-              <button
-                type="submit"
-                disabled={submitting}
-                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"
-              >
-                {submitting ? 'Updating...' : 'Update Menu Item'}
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/admin/menu-items')}
-                className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
+              {/* Available Checkbox */}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="is_available"
+                  id="is_available"
+                  checked={formData.is_available}
+                  onChange={handleChange}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="is_available" className="ml-2 text-sm font-medium text-gray-700">
+                  Available
+                </label>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex flex-col md:flex-row gap-3 pt-2 md:justify-end">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className={`rounded-md cursor-pointer px-4 py-2 text-sm font-medium transition ${
+                    submitting
+                      ? 'bg-blue-400 cursor-not-allowed text-white'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  }`}
+                >
+                  {submitting ? 'Updating...' : 'Update'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => navigate('/admin/menu-items')}
+                  className="rounded-md px-4 py-2 text-sm font-medium
+                            bg-gray-100 hover:bg-gray-200 border border-gray-200
+                            text-gray-800 transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* bottom spacing */}
+          <div className="h-6" />
         </div>
       </div>
 

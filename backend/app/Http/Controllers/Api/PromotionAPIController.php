@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use App\Http\Requests\StorePromotionRequest;
 use App\Http\Requests\UpdatePromotionRequest;
+use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class PromotionAPIController extends Controller
@@ -64,7 +65,15 @@ class PromotionAPIController extends Controller
     public function store(StorePromotionRequest $request)
     {
         try {
-            $promotion = Promotion::create($request->validated());
+            $data = $request->validated();
+
+            // Handle file upload
+            if ($request->hasFile('image')) {
+                $path = $request->file('image')->store('promotions', 'public');
+                $data['image'] = $path;
+            }
+
+            $promotion = Promotion::create($data);
 
             return response()->json([
                 'success' => true,
@@ -106,7 +115,19 @@ class PromotionAPIController extends Controller
     public function update(UpdatePromotionRequest $request, Promotion $promotion)
     {
         try {
-            $promotion->update($request->validated());
+            $data = $request->validated();
+
+            // Handle file upload
+            if ($request->hasFile('image')) {
+                // Delete old image if exists
+                if ($promotion->image && Storage::disk('public')->exists($promotion->image)) {
+                    Storage::disk('public')->delete($promotion->image);
+                }
+                $path = $request->file('image')->store('promotions', 'public');
+                $data['image'] = $path;
+            }
+
+            $promotion->update($data);
 
             return response()->json([
                 'success' => true,
@@ -131,6 +152,11 @@ class PromotionAPIController extends Controller
     public function destroy(Promotion $promotion)
     {
         try {
+            // Delete image if exists
+            if ($promotion->image && Storage::disk('public')->exists($promotion->image)) {
+                Storage::disk('public')->delete($promotion->image);
+            }
+
             $promotion->delete();
 
             return response()->json([

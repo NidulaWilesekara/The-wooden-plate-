@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
@@ -50,6 +51,12 @@ class CategoryController extends Controller
         $data['is_active'] = $data['is_active'] ?? true;
         $data['sort_order'] = $data['sort_order'] ?? 0;
 
+        // Handle file upload
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('categories', 'public');
+            $data['image'] = $path;
+        }
+
         $category = Category::create($data);
 
         return response()->json([
@@ -75,7 +82,19 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, Category $category): JsonResponse
     {
-        $category->update($request->validated());
+        $data = $request->validated();
+
+        // Handle file upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($category->image && Storage::disk('public')->exists($category->image)) {
+                Storage::disk('public')->delete($category->image);
+            }
+            $path = $request->file('image')->store('categories', 'public');
+            $data['image'] = $path;
+        }
+
+        $category->update($data);
 
         return response()->json([
             'success' => true,
@@ -95,6 +114,11 @@ class CategoryController extends Controller
                 'success' => false,
                 'message' => 'Cannot delete category with existing menu items'
             ], 400);
+        }
+
+        // Delete image if exists
+        if ($category->image && Storage::disk('public')->exists($category->image)) {
+            Storage::disk('public')->delete($category->image);
         }
 
         $category->delete();

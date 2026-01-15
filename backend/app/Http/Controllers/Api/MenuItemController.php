@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateMenuItemRequest;
 use App\Models\MenuItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class MenuItemController extends Controller
 {
@@ -66,6 +67,12 @@ class MenuItemController extends Controller
         // Set default availability
         $data['is_available'] = $data['is_available'] ?? true;
 
+        // Handle file upload
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('menu-items', 'public');
+            $data['image'] = $path;
+        }
+
         $menuItem = MenuItem::create($data);
 
         return response()->json([
@@ -91,7 +98,19 @@ class MenuItemController extends Controller
      */
     public function update(UpdateMenuItemRequest $request, MenuItem $menuItem): JsonResponse
     {
-        $menuItem->update($request->validated());
+        $data = $request->validated();
+
+        // Handle file upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($menuItem->image && Storage::disk('public')->exists($menuItem->image)) {
+                Storage::disk('public')->delete($menuItem->image);
+            }
+            $path = $request->file('image')->store('menu-items', 'public');
+            $data['image'] = $path;
+        }
+
+        $menuItem->update($data);
 
         return response()->json([
             'success' => true,
@@ -105,6 +124,11 @@ class MenuItemController extends Controller
      */
     public function destroy(MenuItem $menuItem): JsonResponse
     {
+        // Delete image if exists
+        if ($menuItem->image && Storage::disk('public')->exists($menuItem->image)) {
+            Storage::disk('public')->delete($menuItem->image);
+        }
+
         $menuItem->delete();
 
         return response()->json([

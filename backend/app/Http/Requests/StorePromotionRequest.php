@@ -29,9 +29,17 @@ class StorePromotionRequest extends FormRequest
             'starts_at'   => 'nullable|date',
             'ends_at'     => 'nullable|date|after_or_equal:starts_at',
 
-            'is_active'   => 'nullable|boolean',
+            'is_active'   => 'nullable',
             'description' => 'nullable|string',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'is_active' => filter_var($this->is_active, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true,
+        ]);
     }
 
      public function withValidator($validator)

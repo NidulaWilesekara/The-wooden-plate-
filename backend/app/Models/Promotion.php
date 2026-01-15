@@ -14,6 +14,7 @@ class Promotion extends Model
         'ends_at',
         'is_active',
         'description',
+        'image',
     ];
     protected $casts = [
         'is_active' => 'boolean',

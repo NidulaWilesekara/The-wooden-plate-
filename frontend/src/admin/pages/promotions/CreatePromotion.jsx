@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 
 const CreatePromotion = () => {
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     title: "",
     type: "percentage",
@@ -14,14 +15,31 @@ const CreatePromotion = () => {
     is_active: true,
     description: "",
   });
+
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const token = localStorage.getItem("admin_token");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((p) => ({
+      ...p,
       [name]: type === "checkbox" ? checked : value,
-    });
+    }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -29,22 +47,41 @@ const CreatePromotion = () => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("admin_token");
-      const response = await fetch("http://localhost:8000/api/admin/promotions", {
+      const submitData = new FormData();
+      submitData.append("title", formData.title);
+      submitData.append("type", formData.type);
+      submitData.append("value", formData.value);
+      submitData.append("starts_at", formData.starts_at || "");
+      submitData.append("ends_at", formData.ends_at || "");
+      submitData.append("is_active", formData.is_active ? "1" : "0");
+      submitData.append("description", formData.description || "");
+      if (imageFile) {
+        submitData.append("image", imageFile);
+      }
+
+      const res = await fetch("http://localhost:8000/api/admin/promotions", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: submitData,
       });
 
-      if (!response.ok) throw new Error("Failed to create promotion");
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 422 && data.errors) {
+          const errorMessages = Object.values(data.errors).flat();
+          errorMessages.forEach((msg) => toast.error(msg));
+          return;
+        }
+        throw new Error(data.message || "Failed to create promotion");
+      }
 
       toast.success("Promotion created successfully");
       navigate("/admin/promotions");
-    } catch (error) {
-      toast.error("Failed to create promotion");
+    } catch (err) {
+      toast.error(err.message || "Failed to create promotion");
     } finally {
       setLoading(false);
     }
@@ -52,158 +89,227 @@ const CreatePromotion = () => {
 
   return (
     <AdminLayout>
-      <div className="p-6 max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="mb-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Create Promotion</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Add a new promotion offer
-          </p>
-        </div>
+      <div className="flex-1 py-8">
+        <div className="w-full md:px-8 px-4">
+          {/* HERO HEADER */}
+          <div className="mb-6">
+            <div className="w-full rounded-xl border border-gray-200 bg-gray-100 px-6 py-5 shadow-sm">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                    Create Promotion
+                  </h1>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Add a new promotion to the system
+                  </p>
+                </div>
 
-        {/* Form */}
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Title */}
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-2">
-                Promotion Title <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
-                placeholder="e.g., Weekend Special"
-              />
+                <button
+                  onClick={() => navigate("/admin/promotions")}
+                  className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg
+                             bg-white hover:bg-gray-50 border border-gray-200
+                             text-gray-800 text-sm font-medium transition cursor-pointer"
+                >
+                  ← Back to Promotions
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* FORM CARD */}
+          <div className="w-full rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <div className="px-6 py-5 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Promotion Information
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Fill required fields and click "Create".
+              </p>
             </div>
 
-            {/* Type */}
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-2">
-                Discount Type <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="type"
-                value={formData.type}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
-              >
-                <option value="percentage">Percentage (%)</option>
-                <option value="fixed">Fixed Amount ($)</option>
-              </select>
-            </div>
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Title */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                    Title <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    required
+                    placeholder="e.g., Weekend Special"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900
+                               focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
 
-            {/* Value */}
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-2">
-                Discount Value <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                name="value"
-                value={formData.value}
-                onChange={handleChange}
-                required
-                min="0"
-                max={formData.type === "percentage" ? "100" : undefined}
-                step="0.01"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
-                placeholder={
-                  formData.type === "percentage"
-                    ? "e.g., 20 for 20%"
-                    : "e.g., 10.00 for $10"
-                }
-              />
-              {formData.type === "percentage" && (
-                <p className="text-xs text-gray-500 mt-1">
-                  Maximum value is 100%
-                </p>
-              )}
-            </div>
+                {/* Type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                    Discount Type <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900
+                               focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="percentage">Percentage (%)</option>
+                    <option value="fixed">Fixed Amount</option>
+                  </select>
+                </div>
 
-            {/* Start Date */}
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-2">
-                Start Date & Time
-              </label>
-              <input
-                type="datetime-local"
-                name="starts_at"
-                value={formData.starts_at}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
-              />
-            </div>
+                {/* Value */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                    Value <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    name="value"
+                    value={formData.value}
+                    onChange={handleChange}
+                    required
+                    min="0"
+                    max={formData.type === "percentage" ? "100" : undefined}
+                    step="0.01"
+                    placeholder={formData.type === "percentage" ? "e.g., 20 for 20%" : "e.g., 100.00"}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900
+                               focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
 
-            {/* End Date */}
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-2">
-                End Date & Time
-              </label>
-              <input
-                type="datetime-local"
-                name="ends_at"
-                value={formData.ends_at}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
-              />
-            </div>
+                {/* Active */}
+                <div className="flex items-center pt-8">
+                  <input
+                    type="checkbox"
+                    name="is_active"
+                    checked={formData.is_active}
+                    onChange={handleChange}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <label className="ml-2 text-sm font-medium text-gray-800">
+                    Active
+                  </label>
+                </div>
 
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-2">
-                Description
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                rows="3"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-gray-900 bg-white"
-                placeholder="Enter promotion description"
-              />
-            </div>
+                {/* Start Date */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                    Start Date
+                  </label>
+                  <input
+                    type="datetime-local"
+                    name="starts_at"
+                    value={formData.starts_at}
+                    onChange={handleChange}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900
+                               focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
 
-            {/* Active Checkbox */}
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                name="is_active"
-                checked={formData.is_active}
-                onChange={handleChange}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <label className="ml-2 text-sm font-medium text-gray-700">
-                Activate this promotion immediately
-              </label>
-            </div>
+                {/* End Date */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                    End Date
+                  </label>
+                  <input
+                    type="datetime-local"
+                    name="ends_at"
+                    value={formData.ends_at}
+                    onChange={handleChange}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900
+                               focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
 
-            {/* Buttons */}
-            <div className="flex items-center gap-3 pt-4">
-              <button
-                type="submit"
-                disabled={loading}
-                className={`flex-1 px-6 py-2.5 bg-blue-600 text-white rounded-lg font-medium transition-colors ${
-                  loading
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-blue-700"
-                }`}
-              >
-                {loading ? "Creating..." : "Create Promotion"}
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate("/admin/promotions")}
-                className="flex-1 px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  rows={3}
+                  placeholder="Enter promotion description"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900
+                             focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                />
+              </div>
+
+              {/* Image Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">
+                  Promotion Image
+                </label>
+                <div className="space-y-3">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900
+                               focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-1 file:px-3
+                               file:rounded-md file:border-0 file:text-sm file:font-medium
+                               file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                  {imagePreview && (
+                    <div className="relative w-32 h-32">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-32 h-32 object-cover rounded-lg border border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImageFile(null);
+                          setImagePreview(null);
+                        }}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex flex-col md:flex-row gap-3 pt-2 md:justify-end">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`rounded-md cursor-pointer px-4 py-2 text-sm font-medium transition ${
+                    loading
+                      ? "bg-blue-400 cursor-not-allowed text-white"
+                      : "bg-blue-600 hover:bg-blue-700 text-white"
+                  }`}
+                >
+                  {loading ? "Creating..." : "Create"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => navigate("/admin/promotions")}
+                  className="rounded-md px-4 py-2 text-sm font-medium
+                            bg-gray-100 hover:bg-gray-200 border border-gray-200
+                            text-gray-800 transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div className="h-6" />
         </div>
       </div>
     </AdminLayout>
