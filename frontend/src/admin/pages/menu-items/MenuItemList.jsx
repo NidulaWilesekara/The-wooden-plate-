@@ -108,6 +108,30 @@ const MenuItemList = () => {
     }
   };
 
+  const togglePopular = async (item) => {
+    try {
+      const res = await fetch(`http://localhost:8000/api/admin/menu-items/${item.id}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...item,
+          category_id: item.category_id,
+          is_popular: !item.is_popular,
+        }),
+      });
+
+      if (!res.ok) throw new Error('Failed to update popular status');
+
+      toast.success(item.is_popular ? 'Removed from popular items' : 'Added to popular items');
+      fetchMenuItems();
+    } catch (e) {
+      toast.error('Failed to update popular status');
+    }
+  };
+
   // pagination derived values
   const totalPages = useMemo(
     () => Math.ceil(menuItems.length / itemsPerPage) || 1,
@@ -203,6 +227,9 @@ const MenuItemList = () => {
                       <th className="px-4 py-3 w-28 text-center border-r border-gray-200">
                         Status
                       </th>
+                      <th className="px-4 py-3 w-28 text-center border-r border-gray-200">
+                        Popular
+                      </th>
                       <th className="px-4 py-3 w-32 text-center">Actions</th>
                     </tr>
                   </thead>
@@ -211,7 +238,7 @@ const MenuItemList = () => {
                     {menuItems.length === 0 ? (
                       <tr>
                         <td
-                          colSpan={6}
+                          colSpan={7}
                           className="px-5 py-12 border-t border-gray-200 text-center"
                         >
                           <p className="text-gray-900 font-semibold">
@@ -276,6 +303,22 @@ const MenuItemList = () => {
                               <span
                                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                                   m.is_available ? "translate-x-6" : "translate-x-1"
+                                }`}
+                              />
+                            </button>
+                          </td>
+
+                          <td className="px-4 py-3 w-28 border-t border-gray-200 border-r border-gray-200 text-center">
+                            <button
+                              onClick={() => togglePopular(m)}
+                              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+                                m.is_popular ? "bg-amber-500" : "bg-gray-300"
+                              }`}
+                              title={m.is_popular ? "Click to remove from popular" : "Click to mark as popular"}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  m.is_popular ? "translate-x-6" : "translate-x-1"
                                 }`}
                               />
                             </button>

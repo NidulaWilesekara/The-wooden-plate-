@@ -13,12 +13,14 @@ class MenuItem extends Model
         'price',
         'image',
         'description',
-        'is_available'
+        'is_available',
+        'is_popular'
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
-        'is_available' => 'boolean'
+        'is_available' => 'boolean',
+        'is_popular' => 'boolean'
     ];
 
     /**

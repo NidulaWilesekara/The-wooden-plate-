@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Mail\OtpMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 class CustomerAuthController extends Controller
 {
     /**
-     * Register a new customer (no password required)
+     * Register a new customer (no password)
      */
     public function register(Request $request)
     {
@@ -71,25 +72,29 @@ class CustomerAuthController extends Controller
         }
 
         // Generate 6-digit OTP
-        $otp = rand(100000, 999999);
+        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        // Store OTP in cache for 10 minutes
-        Cache::put('otp_' . $request->email, $otp, now()->addMinutes(10));
+        // Store OTP in cache for 5 minutes
+        Cache::put('otp_' . $request->email, $otp, now()->addMinutes(5));
 
         // Send OTP via email
         try {
-            Mail::raw("Your OTP for login is: {$otp}\n\nThis OTP is valid for 10 minutes.", function ($message) use ($request) {
-                $message->to($request->email)
-                    ->subject('Your Login OTP - The Wooden Plate');
-            });
+            Mail::to($request->email)->send(new OtpMail(
+                $otp,
+                $customer->name,
+                5,
+                null,
+                null
+            ));
         } catch (\Exception $e) {
             // For development, log the OTP
             Log::info("OTP for {$request->email}: {$otp}");
+            Log::error("Mail error: " . $e->getMessage());
         }
 
         return response()->json([
             'message' => 'OTP sent to your email address.',
-            'debug_otp' => config('app.debug') ? $otp : null // Only in debug mode
+            'debug_otp' => config('app.debug') ? $otp : null
         ], 200);
     }
 

@@ -3,10 +3,14 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCustomerAuth } from '../contexts/CustomerAuthContext';
 import toast from 'react-hot-toast';
 
+// Food images for the side panel
+const loginImage = '/images/login-food.jpg';
+const otpImage = '/images/otp-food.jpg';
+
 const LoginPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { login, sendOTP, verifyOTP } = useCustomerAuth();
+    const { sendOTP, verifyOTP } = useCustomerAuth();
     const [step, setStep] = useState(1); // 1: email, 2: OTP
     const [email, setEmail] = useState(location.state?.email || '');
     const [otp, setOTP] = useState('');
@@ -47,9 +51,53 @@ const LoginPage = () => {
         setLoading(false);
     };
 
+    const handleResendOTP = async () => {
+        setLoading(true);
+        const result = await sendOTP({ email });
+        if (result.success) {
+            toast.success('New OTP sent!');
+            setOTP('');
+        } else {
+            toast.error(result.message);
+        }
+        setLoading(false);
+    };
+
     return (
-        <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl">
+        <div className="min-h-screen flex">
+            {/* Left Side - Image (2/3 of screen) */}
+            <div className="hidden lg:flex lg:w-2/3 relative">
+                <img
+                    src={step === 1 ? loginImage : otpImage}
+                    alt="Delicious Food"
+                    className="absolute inset-0 w-full h-full object-cover transition-all duration-500"
+                />
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
+                
+                {/* Content on image */}
+                <div className="relative z-10 flex flex-col justify-center p-12 text-white">
+                    <h1 className="text-5xl font-bold mb-4">
+                        {step === 1 ? 'Welcome Back!' : 'Almost There!'}
+                    </h1>
+                    <p className="text-xl text-gray-200 max-w-md">
+                        {step === 1 
+                            ? 'Sign in to order your favorite dishes and track your orders.'
+                            : 'Enter the verification code we sent to your email.'
+                        }
+                    </p>
+                    
+                    {/* Decorative elements */}
+                    <div className="mt-8 flex items-center gap-4">
+                        <div className="w-12 h-1 bg-amber-500 rounded-full" />
+                        <span className="text-amber-400 font-medium">The Wooden Plate</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Right Side - Form (1/3 of screen) */}
+            <div className="w-full lg:w-1/3 flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-100 p-6 lg:p-8">
+                <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl">
                 <div>
                     <h2 className="text-center text-3xl font-extrabold text-gray-900">
                         Welcome Back
@@ -120,7 +168,7 @@ const LoginPage = () => {
                                 type="text"
                                 required
                                 value={otp}
-                                onChange={(e) => setOTP(e.target.value)}
+                                onChange={(e) => setOTP(e.target.value.replace(/\D/g, '').slice(0, 6))}
                                 maxLength="6"
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-center text-2xl tracking-widest"
                                 placeholder="000000"
@@ -133,20 +181,28 @@ const LoginPage = () => {
                         <div>
                             <button
                                 type="submit"
-                                disabled={loading}
+                                disabled={loading || otp.length !== 6}
                                 className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {loading ? 'Verifying...' : 'Verify & Login'}
                             </button>
                         </div>
 
-                        <div className="text-center">
+                        <div className="flex items-center justify-between">
                             <button
                                 type="button"
-                                onClick={() => setStep(1)}
+                                onClick={() => { setStep(1); setOTP(''); setError(''); }}
                                 className="text-sm text-gray-600 hover:text-gray-900"
                             >
                                 ← Change email
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleResendOTP}
+                                disabled={loading}
+                                className="text-sm text-amber-600 hover:text-amber-500 disabled:opacity-50"
+                            >
+                                Resend OTP
                             </button>
                         </div>
 
@@ -157,6 +213,7 @@ const LoginPage = () => {
                         </div>
                     </form>
                 )}
+                </div>
             </div>
         </div>
     );

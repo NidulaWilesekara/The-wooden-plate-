@@ -9,9 +9,9 @@ import HomePage from './customer/pages/HomePage.jsx'
 import AboutPage from './customer/pages/AboutPage.jsx'
 import MenuPage from './customer/pages/MenuPage.jsx'
 import CartPage from './customer/pages/CartPage.jsx'
-import CheckoutPage from './customer/pages/CheckoutPage.jsx'
-import OrderTrackingPage from './customer/pages/OrderTrackingPage.jsx'
-
+import GalleryPage from './customer/pages/GalleryPage.jsx'
+import ReservationPage from './customer/pages/ReservationPage.jsx'
+import ContactPage from './customer/pages/ContactPage.jsx'
 // Customer Auth Pages
 import LoginPage from './pages/LoginPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
@@ -79,6 +79,11 @@ import CreateSetting from './admin/pages/settings/CreateSetting.jsx'
 import EditSetting from './admin/pages/settings/EditSetting.jsx'
 import ViewSetting from './admin/pages/settings/ViewSetting.jsx'
 
+// Gallery Pages (Admin)
+import GalleryList from './admin/pages/gallery/GalleryList.jsx'
+
+import CustomerLayout from './customer/layout/customerLayout.jsx'
+
 function App() {
   return (
     <CustomerAuthProvider>
@@ -113,18 +118,82 @@ function App() {
           }}
         />
         <Routes>
-          {/* Customer Routes (Public) */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/menu" element={<MenuPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/order/:orderNumber" element={<OrderTrackingPage />} />
-          
-          {/* Customer Auth Routes */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/my-orders" element={<MyOrdersPage />} />
+           {/* Customer Routes */}
+           <Route
+                path="/"
+                element={
+                  <CustomerLayout>
+                    <HomePage />
+                  </CustomerLayout>
+                }
+              />
+
+              <Route
+                path="/menu"
+                element={
+                  <CustomerLayout>
+                    <MenuPage />
+                  </CustomerLayout>
+                }
+              />
+
+              <Route
+                path="/about"
+                element={
+                  <CustomerLayout>
+                    <AboutPage />
+                  </CustomerLayout>
+                }
+              />
+
+              <Route
+                path="/gallery"
+                element={
+                  <CustomerLayout>
+                    <GalleryPage />
+                  </CustomerLayout>
+                }
+              />
+
+              <Route
+                path="/reservation"
+                element={
+                  <CustomerLayout>
+                    <ReservationPage />
+                  </CustomerLayout>
+                }
+              />
+
+              <Route
+                path="/contact"
+                element={
+                  <CustomerLayout>
+                    <ContactPage />
+                  </CustomerLayout>
+                }
+              />
+
+              <Route
+                path="/cart"
+                element={
+                  <CustomerLayout>
+                    <CartPage />
+                  </CustomerLayout>
+                }
+              />
+
+            {/* Customer Auth */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+
+
+
+
+
+
+
+
+
         
         {/* Admin Routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
@@ -187,6 +256,9 @@ function App() {
       <Route path="/admin/settings/create" element={<CreateSetting />} />
       <Route path="/admin/settings/edit/:id" element={<EditSetting />} />
       <Route path="/admin/settings/view/:id" element={<ViewSetting />} />
+      
+      {/* Gallery Routes (Admin) */}
+      <Route path="/admin/gallery" element={<GalleryList />} />
       
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

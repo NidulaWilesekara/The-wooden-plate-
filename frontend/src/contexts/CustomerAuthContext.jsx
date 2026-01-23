@@ -1,6 +1,9 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
+// Set base URL for all axios requests
+axios.defaults.baseURL = 'http://localhost:8000';
+
 const CustomerAuthContext = createContext();
 
 export const useCustomerAuth = () => {
@@ -32,7 +35,6 @@ export const CustomerAuthProvider = ({ children }) => {
     const register = async (userData) => {
         try {
             const response = await axios.post('/api/public/register', userData);
-            
             return { success: true, data: response.data };
         } catch (error) {
             return {
@@ -77,11 +79,6 @@ export const CustomerAuthProvider = ({ children }) => {
         }
     };
 
-    const login = async (credentials) => {
-        // Deprecated - keeping for backward compatibility
-        return sendOTP(credentials);
-    };
-
     const logout = async () => {
         try {
             if (token) {
@@ -109,7 +106,6 @@ export const CustomerAuthProvider = ({ children }) => {
         register,
         sendOTP,
         verifyOTP,
-        login,
         logout,
         isAuthenticated
     };

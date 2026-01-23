@@ -1,15 +1,15 @@
 import React from 'react';
 import CustomerLayout from '../layout/customerLayout';
 
-const CartPage = () => {
+const ContactPage = () => {
 	return (
 		<CustomerLayout>
 			<div className="w-full px-4 sm:px-6 py-16">
-				<h1 className="text-3xl font-semibold">Cart</h1>
-				<p className="text-[#E7D2B6]/70 mt-2">Cart page placeholder.</p>
+				<h1 className="text-3xl font-semibold">Contact</h1>
+				<p className="text-[#E7D2B6]/70 mt-2">Contact page placeholder.</p>
 			</div>
 		</CustomerLayout>
 	);
 };
 
-export default CartPage;
+export default ContactPage;

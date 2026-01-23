@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\StockMovementController;
 use App\Http\Controllers\Api\InventoryReportController;
 use App\Http\Controllers\Api\PublicMenuController;
 use App\Http\Controllers\Api\PublicOrderController;
+use App\Http\Controllers\Api\GalleryController;
 use App\Http\Controllers\CustomerAuthController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController;
@@ -108,6 +109,10 @@ Route::prefix('admin')->group(function () {
             Route::get('promotions', [ReportController::class, 'promotions'])->name('admin.reports.promotions');
             Route::get('customers', [ReportController::class, 'customers'])->name('admin.reports.customers');
         });
+
+        // Gallery Management
+        Route::apiResource('gallery', GalleryController::class);
+        Route::patch('gallery/{id}/toggle-active', [GalleryController::class, 'toggleActive'])->name('admin.gallery.toggleActive');
     });
 });
 
