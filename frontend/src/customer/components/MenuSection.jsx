@@ -2,6 +2,8 @@ import React, { useMemo, useState } from "react";
 import CategoryTabs from "./CategoryTabs";
 import MenuCarousel from "./MenuCarousel";
 
+
+
 const MenuSection = () => {
   const categories = [
     { label: "All Dishes", value: "all" },

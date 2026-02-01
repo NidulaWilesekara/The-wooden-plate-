@@ -185,6 +185,8 @@ function App() {
             {/* Customer Auth */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="About" element={<AboutPage />} />
+            
 
 
 

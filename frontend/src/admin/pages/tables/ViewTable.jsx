@@ -83,7 +83,7 @@ const ViewTable = () => {
               {/* Title Section */}
               <div className="flex-1 text-center md:text-left">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  Table {table.table_number}
+                  Table #{table.table_number}
                 </h2>
                 <p className="text-sm text-gray-600 mt-1">
                   {table.chair_count} chairs

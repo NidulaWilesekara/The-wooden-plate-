@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminLayout from "../../components/AdminLayout";
 import ConfirmModal from "../../components/ConfirmModal";
@@ -6,53 +6,58 @@ import toast from "react-hot-toast";
 
 const TableList = () => {
   const navigate = useNavigate();
+
   const [tables, setTables] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [deleteModal, setDeleteModal] = useState({ open: false, id: null });
 
-  // Pagination
+  // pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  const token = localStorage.getItem("admin_token");
+  // delete modal
+  const [deleteModal, setDeleteModal] = useState({ open: false, id: null });
 
-  useEffect(() => {
-    fetchTables();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const token = localStorage.getItem("admin_token");
 
   const fetchTables = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:8000/api/admin/tables", {
+      const res = await fetch("http://localhost:8000/api/admin/tables", {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json",
         },
       });
 
-      const data = await response.json();
-      if (data.success) {
-        setTables(data.data || []);
-      }
-    } catch (error) {
-      toast.error("Failed to fetch tables");
+      if (!res.ok) throw new Error("Failed to fetch tables");
+
+      const data = await res.json();
+      // Your API uses { success: true, data: [...] }
+      setTables(data.data || []);
+    } catch (e) {
+      toast.error("Failed to load tables", {
+        position: "bottom-right",
+        duration: 3000,
+      });
       setTables([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteClick = (id) => {
-    setDeleteModal({ open: true, id });
-  };
+  useEffect(() => {
+    fetchTables();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleDeleteClick = (id) => setDeleteModal({ open: true, id });
 
   const handleDeleteConfirm = async () => {
     const id = deleteModal.id;
     if (!id) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/api/admin/tables/${id}`, {
+      const res = await fetch(`http://localhost:8000/api/admin/tables/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -60,21 +65,28 @@ const TableList = () => {
         },
       });
 
-      const data = await response.json();
-      if (data.success) {
-        toast.success("Table deleted successfully");
-        setTables((prev) => prev.filter((t) => t.id !== id));
-      } else {
-        toast.error(data.message || "Failed to delete table");
-      }
-    } catch (error) {
-      toast.error("Failed to delete table");
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.message || "Delete failed");
+
+      toast.success("Table deleted successfully!", {
+        position: "bottom-right",
+        duration: 3000,
+        style: { background: "#10B981", color: "#fff" },
+        icon: "🗑️",
+      });
+
+      setTables((prev) => prev.filter((t) => t.id !== id));
+    } catch (e) {
+      toast.error("Failed to delete table", {
+        position: "bottom-right",
+        duration: 3000,
+      });
     }
   };
 
   const toggleStatus = async (table) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/admin/tables/${table.id}`, {
+      const res = await fetch(`http://localhost:8000/api/admin/tables/${table.id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -87,17 +99,27 @@ const TableList = () => {
         }),
       });
 
-      const data = await response.json();
-      if (data.success) {
-        toast.success("Status updated successfully");
-        fetchTables();
-      }
-    } catch (error) {
-      toast.error("Failed to update status");
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.message || "Update failed");
+
+      toast.success("Status updated", {
+        position: "bottom-right",
+        duration: 2500,
+      });
+
+      // update locally (no refetch needed)
+      setTables((prev) =>
+        prev.map((t) => (t.id === table.id ? { ...t, is_active: !t.is_active } : t))
+      );
+    } catch (e) {
+      toast.error("Failed to update status", {
+        position: "bottom-right",
+        duration: 3000,
+      });
     }
   };
 
-  // Pagination derived values
+  // pagination derived values
   const totalPages = useMemo(
     () => Math.ceil(tables.length / itemsPerPage) || 1,
     [tables.length, itemsPerPage]
@@ -136,7 +158,7 @@ const TableList = () => {
                 <button
                   onClick={() => navigate("/admin/tables/create")}
                   className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg
-                             bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium shadow-sm transition cursor-pointer"
+                             bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium shadow-sm transition"
                 >
                   + Add Table
                 </button>
@@ -144,202 +166,256 @@ const TableList = () => {
             </div>
           </div>
 
-          {/* Table card */}
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-            {/* Top bar */}
-            <div className="px-5 py-4 border-b border-gray-200 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          {/* Table Card */}
+          <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-visible">
+            {/* top bar */}
+            <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between gap-3">
               <p className="text-sm font-medium text-gray-900">
-                Table List
-                <span className="text-gray-400 font-normal"> ({tables.length})</span>
+                Table List{" "}
+                <span className="text-gray-400 font-normal">
+                  ({tables.length})
+                </span>
               </p>
 
-              <div className="flex items-center gap-3">
-                <label className="text-sm text-gray-600">Show</label>
+              {tables.length > 0 && (
                 <select
                   value={itemsPerPage}
                   onChange={handleItemsPerPageChange}
-                  className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm
+                  className="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-700
                              focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value={5}>5</option>
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
+                  <option value={10}>10 per page</option>
+                  <option value={25}>25 per page</option>
+                  <option value={50}>50 per page</option>
+                  <option value={100}>100 per page</option>
                 </select>
-                <span className="text-sm text-gray-600">entries</span>
-              </div>
+              )}
             </div>
 
-            {/* Loading state */}
             {loading ? (
-              <div className="p-10 text-center text-gray-600">Loading tables...</div>
-            ) : tables.length === 0 ? (
-              <div className="p-10 text-center">
-                <p className="text-gray-900 font-semibold">No tables found</p>
-                <p className="text-sm text-gray-500 mt-1">
-                  Create your first table to see it here.
-                </p>
-                <button
-                  onClick={() => navigate("/admin/tables/create")}
-                  className="mt-4 px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium"
-                >
-                  + Add Table
-                </button>
-              </div>
+              <div className="p-8 text-sm text-gray-600">Loading tables...</div>
             ) : (
-              <>
-                <div className="w-full overflow-x-auto">
-                  <table className="w-full border-separate border-spacing-0">
-                    <thead>
-                      <tr className="text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">
-                        <th className="px-5 py-3 border-b border-gray-200">Table #</th>
-                        <th className="px-5 py-3 border-b border-gray-200">Chairs</th>
-                        <th className="px-5 py-3 border-b border-gray-200">Status</th>
-                        <th className="px-5 py-3 border-b border-gray-200">Notes</th>
-                        <th className="px-5 py-3 border-b border-gray-200 text-center">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {paginatedTables.map((table, idx) => (
-                        <tr
-                          key={table.id}
-                          className={idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"}
+              <div className="w-full">
+                <table className="w-full border-separate border-spacing-0">
+                  <thead className="bg-gray-50">
+                    <tr className="text-xs font-semibold uppercase tracking-wider text-gray-700">
+                      <th className="px-4 py-3 w-32 text-left border-r border-gray-200">
+                        Number
+                      </th>
+                      <th className="px-4 py-3 w-28 text-center border-r border-gray-200">
+                        Chairs
+                      </th>
+                      <th className="px-4 py-3 w-40 text-center border-r border-gray-200">
+                        Status
+                      </th>
+                      <th className="px-4 py-3 text-left border-r border-gray-200">
+                        Notes
+                      </th>
+                      <th className="px-4 py-3 w-32 text-center">Actions</th>
+                    </tr>
+                  </thead>
+
+                  <tbody className="text-sm text-gray-700">
+                    {tables.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={5}
+                          className="px-5 py-12 border-t border-gray-200 text-center"
                         >
-                          <td className="px-5 py-4 border-b border-gray-100">
-                            <span className="font-medium text-gray-900">
-                              Table {table.table_number}
-                            </span>
+                          <p className="text-gray-900 font-semibold">
+                            No tables found
+                          </p>
+                          <p className="text-sm text-gray-500 mt-1">
+                            Create your first table to see it here.
+                          </p>
+                          <button
+                            onClick={() => navigate("/admin/tables/create")}
+                            className="mt-4 px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium"
+                          >
+                            + Add Table
+                          </button>
+                        </td>
+                      </tr>
+                    ) : (
+                      paginatedTables.map((t) => (
+                        <tr key={t.id} className="hover:bg-gray-50">
+                          {/* Number */}
+                          <td className="px-4 py-3 border-t border-gray-200 border-r border-gray-200">
+                            <div className="font-semibold text-gray-900">
+                              #{t.table_number}
+                            </div>
                           </td>
-                          <td className="px-5 py-4 border-b border-gray-100 text-sm text-gray-600">
-                            {table.chair_count} chairs
+
+                          {/* Chairs */}
+                          <td className="px-4 py-3 border-t border-gray-200 border-r border-gray-200 text-center">
+                            {t.chair_count}
                           </td>
-                          <td className="px-5 py-4 border-b border-gray-100">
+
+                          {/* Status */}
+                          <td className="px-4 py-3 border-t border-gray-200 border-r border-gray-200 text-center">
                             <button
-                              onClick={() => toggleStatus(table)}
-                              className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                table.is_active
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
+                              onClick={() => toggleStatus(t)}
+                              className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border transition ${
+                                t.is_active
+                                  ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                                  : "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200"
                               }`}
+                              title="Click to toggle"
                             >
-                              {table.is_active ? "Active" : "Inactive"}
+                              <span
+                                className={`w-2 h-2 rounded-full ${
+                                  t.is_active ? "bg-green-600" : "bg-gray-500"
+                                }`}
+                              />
+                              {t.is_active ? "Active" : "Inactive"}
                             </button>
                           </td>
-                          <td className="px-5 py-4 border-b border-gray-100 text-sm text-gray-600 max-w-xs truncate">
-                            {table.notes || "—"}
+
+                          {/* Notes */}
+                          <td className="px-4 py-3 border-t border-gray-200 border-r border-gray-200">
+                            <div className="truncate max-w-[520px] text-gray-600">
+                              {t.notes || "—"}
+                            </div>
                           </td>
-                          <td className="px-5 py-4 border-b border-gray-100">
-                            <div className="flex items-center justify-center gap-2">
-                              {/* View */}
+
+                          {/* Actions */}
+                          <td className="px-5 py-3 border-t border-gray-200">
+                            <div className="flex items-center justify-center gap-6">
+                              {/* VIEW */}
                               <button
-                                onClick={() => navigate(`/admin/tables/${table.id}`)}
-                                className="p-1.5 rounded-md border border-blue-200 bg-blue-50 text-blue-600
-                                           hover:bg-blue-100 transition"
+                                onClick={() => navigate(`/admin/tables/${t.id}`)}
                                 title="View"
+                                className="p-1.5 rounded-md border border-blue-200 bg-blue-50 
+                                           text-blue-600 hover:bg-blue-100 transition"
                               >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                  />
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                  />
                                 </svg>
                               </button>
 
-                              {/* Edit */}
+                              {/* EDIT */}
                               <button
-                                onClick={() => navigate(`/admin/tables/${table.id}/edit`)}
-                                className="p-1.5 rounded-md border border-gray-300 bg-gray-100 text-gray-800
-                                           hover:bg-gray-200 transition"
+                                onClick={() =>
+                                  navigate(`/admin/tables/${t.id}/edit`)
+                                }
                                 title="Edit"
+                                className="p-1.5 rounded-md border border-gray-300 bg-gray-100 
+                                           text-gray-800 hover:bg-gray-200 transition"
                               >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                  />
                                 </svg>
                               </button>
 
-                              {/* Delete */}
+                              {/* DELETE */}
                               <button
-                                onClick={() => handleDeleteClick(table.id)}
-                                className="p-1.5 rounded-md border border-red-200 bg-red-50 text-red-600
-                                           hover:bg-red-100 transition"
+                                onClick={() => handleDeleteClick(t.id)}
                                 title="Delete"
+                                className="p-1.5 rounded-md border border-red-200 bg-red-50 
+                                           text-red-600 hover:bg-red-100 transition"
                               >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                  />
                                 </svg>
                               </button>
                             </div>
                           </td>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Pagination footer */}
+            {!loading && tables.length > 0 && (
+              <div className="px-5 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p className="text-sm text-gray-600">
+                  Showing{" "}
+                  <span className="font-semibold text-gray-900">
+                    {startIndex + 1}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-semibold text-gray-900">
+                    {Math.min(endIndex, tables.length)}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-semibold text-gray-900">
+                    {tables.length}
+                  </span>{" "}
+                  results
+                </p>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700
+                               hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  >
+                    Previous
+                  </button>
+
+                  <button
+                    className="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium"
+                    disabled
+                  >
+                    {currentPage} / {totalPages}
+                  </button>
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700
+                               hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  >
+                    Next
+                  </button>
                 </div>
-
-                {/* Pagination */}
-                <div className="px-5 py-4 border-t border-gray-200 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  <p className="text-sm text-gray-600">
-                    Showing {startIndex + 1} to {Math.min(endIndex, tables.length)} of {tables.length} entries
-                  </p>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-sm text-gray-700
-                                 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Previous
-                    </button>
-
-                    {Array.from({ length: totalPages }, (_, i) => i + 1)
-                      .filter(
-                        (page) =>
-                          page === 1 ||
-                          page === totalPages ||
-                          Math.abs(page - currentPage) <= 1
-                      )
-                      .reduce((acc, page, idx, arr) => {
-                        if (idx > 0 && page - arr[idx - 1] > 1) {
-                          acc.push("...");
-                        }
-                        acc.push(page);
-                        return acc;
-                      }, [])
-                      .map((page, idx) =>
-                        page === "..." ? (
-                          <span key={`ellipsis-${idx}`} className="px-2 text-gray-400">
-                            ...
-                          </span>
-                        ) : (
-                          <button
-                            key={page}
-                            onClick={() => handlePageChange(page)}
-                            className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition ${
-                              currentPage === page
-                                ? "border-blue-600 bg-blue-600 text-white"
-                                : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-                            }`}
-                          >
-                            {page}
-                          </button>
-                        )
-                      )}
-
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-sm text-gray-700
-                                 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Next
-                    </button>
-                  </div>
-                </div>
-              </>
+              </div>
             )}
           </div>
         </div>
       </div>
 
+      {/* Delete Confirmation Modal */}
       <ConfirmModal
         isOpen={deleteModal.open}
         onClose={() => setDeleteModal({ open: false, id: null })}
