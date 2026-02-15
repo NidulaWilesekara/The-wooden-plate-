@@ -9,6 +9,7 @@ import Newsletter from "../components/Newsletter";
 import PromoBannerStrip from "../components/PromoBannerStrip";
 import NewProductBannerStrip from "../components/NewProductBannerStrip";
 import MenuCategoriesSection from "../components/MenuCategoriesSection";
+import Footer from "../components/Footer";
 
 const HomePage = () => {
   return (
@@ -32,6 +33,8 @@ const HomePage = () => {
       <ContactSection />
 
       <Newsletter />
+
+      <Footer />
 
     </div>
   );

@@ -24,8 +24,10 @@ use App\Http\Controllers\OrderController;
 // PUBLIC CUSTOMER API ROUTES (No Auth Required)
 // ============================================
 Route::prefix('public')->group(function () {
-    // Customer Authentication (OTP-based)
+    // Customer Authentication
     Route::post('register', [CustomerAuthController::class, 'register']);
+    Route::post('login', [CustomerAuthController::class, 'login']);
+    Route::post('check-email', [CustomerAuthController::class, 'checkEmail']);
     Route::post('send-otp', [CustomerAuthController::class, 'sendOTP']);
     Route::post('verify-otp', [CustomerAuthController::class, 'verifyOTP']);
 
@@ -38,6 +40,16 @@ Route::prefix('public')->group(function () {
     // Orders (Guest Checkout)
     Route::post('orders', [PublicOrderController::class, 'store']);
     Route::get('orders/{orderNumber}', [PublicOrderController::class, 'track']);
+
+    // Gallery (Public - active images only)
+    Route::get('gallery', [GalleryController::class, 'publicIndex']);
+
+    // Tables (Public - for reservation form)
+    Route::get('tables', [TableController::class, 'publicIndex']);
+    Route::get('tables/available', [TableController::class, 'publicAvailable']);
+
+    // Reservations (Public - with customer auth token)
+    Route::post('reservations', [ReservationController::class, 'publicStore']);
 });
 
 // ============================================

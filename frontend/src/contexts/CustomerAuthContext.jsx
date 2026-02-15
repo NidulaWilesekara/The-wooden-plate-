@@ -45,6 +45,39 @@ export const CustomerAuthProvider = ({ children }) => {
         }
     };
 
+    // Direct login for existing customers (no OTP needed)
+    const login = async ({ email }) => {
+        try {
+            const response = await axios.post('/api/public/login', { email });
+            const { customer: loggedInCustomer, token: newToken } = response.data;
+
+            setCustomer(loggedInCustomer);
+            setToken(newToken);
+            localStorage.setItem('customerToken', newToken);
+            localStorage.setItem('customer', JSON.stringify(loggedInCustomer));
+            axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+
+            return { success: true, data: response.data };
+        } catch (error) {
+            return {
+                success: false,
+                message: error.response?.data?.message || 'Login failed',
+                exists: error.response?.data?.exists,
+                errors: error.response?.data?.errors
+            };
+        }
+    };
+
+    // Check if email exists in the system
+    const checkEmail = async ({ email }) => {
+        try {
+            const response = await axios.post('/api/public/check-email', { email });
+            return { success: true, exists: response.data.exists, customerName: response.data.customer_name };
+        } catch (error) {
+            return { success: false, exists: false };
+        }
+    };
+
     const sendOTP = async ({ email }) => {
         try {
             const response = await axios.post('/api/public/send-otp', { email });
@@ -104,6 +137,8 @@ export const CustomerAuthProvider = ({ children }) => {
         token,
         loading,
         register,
+        login,
+        checkEmail,
         sendOTP,
         verifyOTP,
         logout,

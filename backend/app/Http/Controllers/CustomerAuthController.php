@@ -146,6 +146,66 @@ class CustomerAuthController extends Controller
     }
 
     /**
+     * Direct login for existing customers (no OTP needed)
+     */
+    public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $customer = Customer::where('email', $request->email)->first();
+
+        if (!$customer) {
+            return response()->json([
+                'message' => 'No account found with this email. Please register first.',
+                'exists' => false
+            ], 404);
+        }
+
+        // Create token directly for existing customer
+        $token = $customer->createToken('customer-token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Login successful',
+            'customer' => $customer,
+            'token' => $token,
+            'exists' => true
+        ], 200);
+    }
+
+    /**
+     * Check if customer exists by email
+     */
+    public function checkEmail(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $customer = Customer::where('email', $request->email)->first();
+
+        return response()->json([
+            'exists' => !!$customer,
+            'customer_name' => $customer ? $customer->name : null
+        ], 200);
+    }
+
+    /**
      * Logout customer
      */
     public function logout(Request $request)

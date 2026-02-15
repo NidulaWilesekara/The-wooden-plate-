@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useCustomerAuth } from "../../contexts/CustomerAuthContext";
 
 const navLinks = [
   { name: "Home", id: "home" },
@@ -13,6 +14,7 @@ const navLinks = [
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { customer, isAuthenticated, logout } = useCustomerAuth();
 
   useEffect(() => {
     const onScroll = () => {
@@ -27,6 +29,11 @@ const Navbar = () => {
     if (!el) return;
     const y = el.getBoundingClientRect().top + window.scrollY - 90;
     window.scrollTo({ top: y, behavior: "smooth" });
+    setIsMenuOpen(false);
+  };
+
+  const handleLogout = async () => {
+    await logout();
     setIsMenuOpen(false);
   };
 
@@ -67,18 +74,34 @@ const Navbar = () => {
 
         {/* Right buttons */}
         <div className="hidden md:flex items-center gap-3">
-          <Link 
-            to="/login" 
-            className="px-4 py-2 rounded-full border border-[#D7B38A]/50 text-[#E7D2B6] hover:bg-[#D7B38A]/10 transition"
-          >
-            Login
-          </Link>
-          <Link 
-            to="/register" 
-            className="px-4 py-2 rounded-full bg-[#D7B38A] text-[#1A120F] hover:opacity-90 transition"
-          >
-            Register
-          </Link>
+          {isAuthenticated() ? (
+            <>
+              <span className="text-[#E7D2B6] text-sm">
+                Hi, <span className="text-[#D7B38A] font-medium">{customer?.name?.split(' ')[0] || 'Guest'}</span>
+              </span>
+              <button 
+                onClick={handleLogout}
+                className="px-4 py-2 rounded-full border border-[#D7B38A]/50 text-[#E7D2B6] hover:bg-red-500/20 hover:border-red-500/50 transition"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link 
+                to="/login" 
+                className="px-4 py-2 rounded-full border border-[#D7B38A]/50 text-[#E7D2B6] hover:bg-[#D7B38A]/10 transition"
+              >
+                Login
+              </Link>
+              <Link 
+                to="/register" 
+                className="px-4 py-2 rounded-full bg-[#D7B38A] text-[#1A120F] hover:opacity-90 transition"
+              >
+                Register
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile menu icon */}
@@ -114,18 +137,34 @@ const Navbar = () => {
           </button>
         ))}
 
-        <Link 
-          to="/login" 
-          className="px-6 py-2 rounded-full border border-[#D7B38A] hover:bg-[#D7B38A]/10 transition"
-        >
-          Login
-        </Link>
-        <Link 
-          to="/register" 
-          className="px-6 py-2 rounded-full bg-[#D7B38A] text-[#1A120F] hover:opacity-90 transition"
-        >
-          Register
-        </Link>
+        {isAuthenticated() ? (
+          <>
+            <span className="text-[#D7B38A] font-medium">
+              {customer?.name || 'Guest'}
+            </span>
+            <button 
+              onClick={handleLogout}
+              className="px-6 py-2 rounded-full border border-red-500/50 text-red-400 hover:bg-red-500/20 transition"
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <Link 
+              to="/login" 
+              className="px-6 py-2 rounded-full border border-[#D7B38A] hover:bg-[#D7B38A]/10 transition"
+            >
+              Login
+            </Link>
+            <Link 
+              to="/register" 
+              className="px-6 py-2 rounded-full bg-[#D7B38A] text-[#1A120F] hover:opacity-90 transition"
+            >
+              Register
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   );

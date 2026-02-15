@@ -12,7 +12,7 @@ const CustomerLayout = ({ children }) => {
         {children}
       </main>
 
-      <Footer />
+      
     </div>
   );
 };

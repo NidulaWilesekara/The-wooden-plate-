@@ -1,232 +1,90 @@
-import React, { useMemo, useState } from "react";
+import React from "react";
+import { Link } from "react-router-dom";
 
 const ReservationSection = () => {
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    date: "",
-    time: "",
-    guests: "2",
-    notes: "",
-  });
-
-  const timeSlots = useMemo(
-    () => [
-      "10:00 AM", "10:30 AM",
-      "11:00 AM", "11:30 AM",
-      "12:00 PM", "12:30 PM",
-      "01:00 PM", "01:30 PM",
-      "02:00 PM", "02:30 PM",
-      "05:00 PM", "05:30 PM",
-      "06:00 PM", "06:30 PM",
-      "07:00 PM", "07:30 PM",
-      "08:00 PM", "08:30 PM",
-      "09:00 PM", "09:30 PM",
-    ],
-    []
-  );
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((p) => ({ ...p, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (!form.name || !form.phone || !form.email || !form.date || !form.time) {
-      alert("Please fill all required fields.");
-      return;
-    }
-
-    console.log("Reservation:", form);
-    alert("Reservation submitted! (Later we will connect API)");
-
-    setForm({
-      name: "",
-      phone: "",
-      email: "",
-      date: "",
-      time: "",
-      guests: "2",
-      notes: "",
-    });
-  };
-
   return (
     <section id="reservation" className="py-20 bg-[#0F0A08] text-[#E7D2B6]">
       <div className="max-w-6xl mx-auto px-4">
-        {/* Title */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-[#C98A5A]">
-            Reservation
-          </h2>
-          <p className="mt-3 text-[#BFA58A] max-w-2xl mx-auto">
-            Reserve your table in advance and enjoy the perfect dining experience.
-          </p>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left Side - Image */}
+          <div className="relative">
+            <div className="rounded-3xl overflow-hidden border border-[#8B5A2B]/30 shadow-[0_25px_80px_rgba(0,0,0,0.55)]">
+              <img
+                src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1400&q=80"
+                alt="Restaurant Interior"
+                className="w-full h-[400px] md:h-[500px] object-cover"
+              />
+            </div>
+            {/* Decorative elements */}
+            <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-[#C98A5A]/10 rounded-full blur-2xl" />
+            <div className="absolute -top-6 -left-6 w-24 h-24 bg-[#D7B38A]/10 rounded-full blur-xl" />
+          </div>
 
-        {/* Form Card (Centered + Large) */}
-        <div className="max-w-4xl mx-auto">
-          <div
-            className="rounded-3xl border border-[#8B5A2B]/50 bg-[#1A110D] p-6 md:p-10
-                       shadow-[0_25px_80px_rgba(0,0,0,0.55)]"
-          >
-            <div className="mb-8">
-              <h3 className="text-2xl md:text-3xl font-semibold text-[#E7D2B6]">
-                Book a Table
-              </h3>
-              <p className="mt-2 text-[#BFA58A] text-sm md:text-base">
-                Fill the form below and we’ll confirm your booking via email or phone.
-              </p>
+          {/* Right Side - Content */}
+          <div className="text-center lg:text-left">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-[#C98A5A] mb-6">
+              Reserve Your Table
+            </h2>
+            <p className="text-lg md:text-xl text-[#BFA58A] mb-4 leading-relaxed">
+              Experience the perfect dining atmosphere at The Wooden Plate.
+              Reserve your table in advance and let us prepare an unforgettable
+              culinary journey for you.
+            </p>
+            <p className="text-[#E7D2B6]/70 mb-8">
+              Choose from our cozy tables, select your preferred date and time,
+              and we will have everything ready for your arrival.
+            </p>
+
+            {/* Features */}
+            <div className="grid grid-cols-2 gap-4 mb-10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#C98A5A]/20 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-[#C98A5A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span className="text-sm text-[#E7D2B6]">Easy Online Booking</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#C98A5A]/20 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-[#C98A5A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <span className="text-sm text-[#E7D2B6]">Flexible Timing</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#C98A5A]/20 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-[#C98A5A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <span className="text-sm text-[#E7D2B6]">Email Confirmation</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#C98A5A]/20 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-[#C98A5A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <span className="text-sm text-[#E7D2B6]">Group Bookings</span>
+              </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Name */}
-                <div>
-                  <label className="block text-sm font-medium text-[#E7D2B6] mb-2">
-                    Name <span className="text-[#C98A5A]">*</span>
-                  </label>
-                  <input
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    placeholder="Your name"
-                    className="w-full rounded-2xl border border-[#8B5A2B]/40 bg-black/25 px-5 py-4
-                               text-[#E7D2B6] placeholder:text-[#BFA58A]/60
-                               focus:outline-none focus:ring-2 focus:ring-[#C98A5A]/60"
-                  />
-                </div>
-
-                {/* Phone */}
-                <div>
-                  <label className="block text-sm font-medium text-[#E7D2B6] mb-2">
-                    Phone <span className="text-[#C98A5A]">*</span>
-                  </label>
-                  <input
-                    name="phone"
-                    value={form.phone}
-                    onChange={handleChange}
-                    placeholder="07xxxxxxxx"
-                    className="w-full rounded-2xl border border-[#8B5A2B]/40 bg-black/25 px-5 py-4
-                               text-[#E7D2B6] placeholder:text-[#BFA58A]/60
-                               focus:outline-none focus:ring-2 focus:ring-[#C98A5A]/60"
-                  />
-                </div>
-
-                {/* Email */}
-                <div>
-                  <label className="block text-sm font-medium text-[#E7D2B6] mb-2">
-                    Email <span className="text-[#C98A5A]">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    placeholder="your@email.com"
-                    className="w-full rounded-2xl border border-[#8B5A2B]/40 bg-black/25 px-5 py-4
-                               text-[#E7D2B6] placeholder:text-[#BFA58A]/60
-                               focus:outline-none focus:ring-2 focus:ring-[#C98A5A]/60"
-                  />
-                </div>
-
-                {/* Guests */}
-                <div>
-                  <label className="block text-sm font-medium text-[#E7D2B6] mb-2">
-                    Guests
-                  </label>
-                  <select
-                    name="guests"
-                    value={form.guests}
-                    onChange={handleChange}
-                    className="w-full rounded-2xl border border-[#8B5A2B]/40 bg-black/25 px-5 py-4
-                               text-[#E7D2B6]
-                               focus:outline-none focus:ring-2 focus:ring-[#C98A5A]/60"
-                  >
-                    {Array.from({ length: 10 }).map((_, i) => (
-                      <option key={i + 1} value={String(i + 1)} className="bg-[#120B08]">
-                        {i + 1} Guest{i + 1 > 1 ? "s" : ""}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Date */}
-                <div>
-                  <label className="block text-sm font-medium text-[#E7D2B6] mb-2">
-                    Date <span className="text-[#C98A5A]">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    name="date"
-                    value={form.date}
-                    onChange={handleChange}
-                    className="w-full rounded-2xl border border-[#8B5A2B]/40 bg-black/25 px-5 py-4
-                               text-[#E7D2B6]
-                               focus:outline-none focus:ring-2 focus:ring-[#C98A5A]/60"
-                  />
-                </div>
-
-                {/* Time */}
-                <div>
-                  <label className="block text-sm font-medium text-[#E7D2B6] mb-2">
-                    Time <span className="text-[#C98A5A]">*</span>
-                  </label>
-                  <select
-                    name="time"
-                    value={form.time}
-                    onChange={handleChange}
-                    className="w-full rounded-2xl border border-[#8B5A2B]/40 bg-black/25 px-5 py-4
-                               text-[#E7D2B6]
-                               focus:outline-none focus:ring-2 focus:ring-[#C98A5A]/60"
-                  >
-                    <option value="" className="bg-[#120B08]">
-                      Select time
-                    </option>
-                    {timeSlots.map((t) => (
-                      <option key={t} value={t} className="bg-[#120B08]">
-                        {t}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Notes */}
-              <div>
-                <label className="block text-sm font-medium text-[#E7D2B6] mb-2">
-                  Special Notes (optional)
-                </label>
-                <textarea
-                  name="notes"
-                  value={form.notes}
-                  onChange={handleChange}
-                  rows={5}
-                  placeholder="Any special request?"
-                  className="w-full rounded-2xl border border-[#8B5A2B]/40 bg-black/25 px-5 py-4
-                             text-[#E7D2B6] placeholder:text-[#BFA58A]/60
-                             focus:outline-none focus:ring-2 focus:ring-[#C98A5A]/60 resize-none"
-                />
-              </div>
-
-              {/* Submit */}
-              <button
-                type="submit"
-                className="w-full inline-flex items-center justify-center px-6 py-4 rounded-full
-                           bg-gradient-to-r from-[#C98A5A] to-[#D7B38A]
-                           text-[#0F0A08] font-bold text-base
-                           hover:brightness-110 transition"
-              >
-                Book Table
-              </button>
-
-              <p className="text-xs text-[#BFA58A] text-center pt-2">
-                By booking, you agree to receive confirmation by email/phone.
-              </p>
-            </form>
+            {/* CTA Button */}
+            <Link
+              to="/reservation"
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-full
+                         bg-gradient-to-r from-[#C98A5A] to-[#D7B38A]
+                         text-[#0F0A08] font-bold text-lg
+                         hover:brightness-110 hover:scale-105 transition-all duration-300
+                         shadow-[0_10px_40px_rgba(201,138,90,0.3)]"
+            >
+              <span>Book a Table</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
           </div>
         </div>
 

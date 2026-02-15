@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreReservationRequest;
 use App\Http\Requests\UpdateReservationStatusRequest;
 use App\Models\Reservation;
+use App\Mail\ReservationConfirmedMail;
+use App\Mail\ReservationCancelledMail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class ReservationController extends Controller
 {
@@ -141,6 +144,18 @@ class ReservationController extends Controller
             'admin_notes' => $request->admin_notes,
         ]);
 
+        // Send email notification based on status change
+        try {
+            if ($newStatus === 'confirmed' && $reservation->customer && $reservation->customer->email) {
+                Mail::to($reservation->customer->email)->send(new ReservationConfirmedMail($reservation));
+            } elseif ($newStatus === 'cancelled' && $reservation->customer && $reservation->customer->email) {
+                Mail::to($reservation->customer->email)->send(new ReservationCancelledMail($reservation, $request->admin_notes));
+            }
+        } catch (\Exception $e) {
+            // Log email error but don't fail the status update
+            \Log::error('Failed to send reservation email: ' . $e->getMessage());
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Reservation status updated successfully',
@@ -191,5 +206,83 @@ class ReservationController extends Controller
             'success' => true,
             'count' => $count
         ]);
+    }
+
+    /**
+     * Store a reservation from public form (requires customer auth token)
+     */
+    public function publicStore(Request $request): JsonResponse
+    {
+        // Validate request
+        $validated = $request->validate([
+            'table_id' => 'required|exists:tables,id',
+            'party_size' => 'required|integer|min:1|max:20',
+            'reservation_date' => 'required|date|after_or_equal:today',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
+            'customer_name' => 'required|string|max:255',
+            'customer_email' => 'required|email|max:255',
+            'customer_phone' => 'required|string|max:20',
+            'customer_notes' => 'nullable|string|max:1000',
+        ]);
+
+        // Calculate duration and validate max 3 hours
+        $start = \Carbon\Carbon::createFromFormat('H:i', $validated['start_time']);
+        $end = \Carbon\Carbon::createFromFormat('H:i', $validated['end_time']);
+        $durationMinutes = $start->diffInMinutes($end);
+
+        if ($durationMinutes > 180) { // 3 hours max
+            return response()->json([
+                'success' => false,
+                'message' => 'Maximum reservation duration is 3 hours'
+            ], 422);
+        }
+
+        // Check if table is available
+        $table = \App\Models\Table::find($validated['table_id']);
+        if (!$table->isAvailable($validated['reservation_date'], $validated['start_time'], $validated['end_time'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This table is not available for the selected time slot'
+            ], 422);
+        }
+
+        // Get or create customer
+        $customer = null;
+        if ($request->user()) {
+            $customer = $request->user();
+        } else {
+            // Try to find existing customer by email
+            $customer = \App\Models\Customer::where('email', $validated['customer_email'])->first();
+
+            if (!$customer) {
+                // Create guest customer record
+                $customer = \App\Models\Customer::create([
+                    'name' => $validated['customer_name'],
+                    'email' => $validated['customer_email'],
+                    'phone' => $validated['customer_phone'],
+                ]);
+            }
+        }
+
+        // Create reservation
+        $reservation = Reservation::create([
+            'customer_id' => $customer->id,
+            'table_id' => $validated['table_id'],
+            'party_size' => $validated['party_size'],
+            'reservation_date' => $validated['reservation_date'],
+            'start_time' => $validated['start_time'],
+            'end_time' => $validated['end_time'],
+            'status' => 'pending',
+            'customer_notes' => $validated['customer_notes'] ?? null,
+        ]);
+
+        $reservation->load(['table', 'customer']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Reservation created successfully. You will receive a confirmation email shortly.',
+            'data' => $reservation
+        ], 201);
     }
 }

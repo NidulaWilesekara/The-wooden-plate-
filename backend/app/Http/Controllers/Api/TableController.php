@@ -141,4 +141,53 @@ class TableController extends Controller
             'data' => $tables
         ]);
     }
+
+    /**
+     * Get all active tables for public display (reservation form)
+     */
+    public function publicIndex(): JsonResponse
+    {
+        $tables = Table::active()
+            ->orderBy('table_number', 'asc')
+            ->get(['id', 'table_number', 'chair_count']);
+
+        return response()->json([
+            'success' => true,
+            'data' => $tables
+        ]);
+    }
+
+    /**
+     * Get available tables for public reservation with availability status
+     */
+    public function publicAvailable(Request $request): JsonResponse
+    {
+        $request->validate([
+            'date' => 'required|date|after_or_equal:today',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
+            'party_size' => 'sometimes|integer|min:1',
+        ]);
+
+        $tables = Table::active()
+            ->orderBy('table_number', 'asc')
+            ->get()
+            ->map(function ($table) use ($request) {
+                return [
+                    'id' => $table->id,
+                    'table_number' => $table->table_number,
+                    'chair_count' => $table->chair_count,
+                    'available' => $table->isAvailable(
+                        $request->date,
+                        $request->start_time,
+                        $request->end_time
+                    ),
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $tables
+        ]);
+    }
 }

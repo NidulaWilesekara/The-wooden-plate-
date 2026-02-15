@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const galleryCards = [
+const API_BASE = "http://localhost:8000";
+
+// Fallback images if API returns empty
+const fallbackGalleryCards = [
   {
     title: "Cozy Interior",
     image:
@@ -35,9 +38,58 @@ const galleryCards = [
 
 const GallerySection = () => {
   const [stopScroll, setStopScroll] = useState(false);
+  const [galleryCards, setGalleryCards] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch gallery images from API
+  useEffect(() => {
+    const fetchGalleryImages = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/api/public/gallery`);
+        const data = await response.json();
+        
+        if (data.success && data.data && data.data.length > 0) {
+          // Map API data to gallery card format
+          const apiImages = data.data.map((img, index) => ({
+            id: img.id,
+            title: `Gallery Image ${index + 1}`,
+            image: img.image.startsWith('http') ? img.image : `${API_BASE}${img.image}`,
+          }));
+          setGalleryCards(apiImages);
+        } else {
+          // Use fallback images if no images from API
+          setGalleryCards(fallbackGalleryCards);
+        }
+      } catch (error) {
+        console.error("Failed to fetch gallery images:", error);
+        // Use fallback images on error
+        setGalleryCards(fallbackGalleryCards);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGalleryImages();
+  }, []);
 
   // speed: increase value to slow down
   const durationMs = galleryCards.length * 2600;
+
+  // Don't render if still loading or no images
+  if (loading) {
+    return (
+      <section id="gallery" className="py-20 bg-[#0F0A08] text-[#E7D2B6]">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-[#C98A5A]">
+              Gallery
+            </h2>
+            <p className="mt-3 text-[#BFA58A]">Loading gallery...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="gallery" className="py-20 bg-[#0F0A08] text-[#E7D2B6]">
@@ -87,20 +139,20 @@ const GallerySection = () => {
                   {/* overlay */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300">
                     <div className="absolute inset-0 bg-black/35 backdrop-blur-[2px]" />
-                    <div className="absolute inset-0 flex items-center justify-center px-5">
+                    {/* <div className="absolute inset-0 flex items-center justify-center px-5">
                       <p className="text-[#E7D2B6] text-lg font-semibold text-center">
                         {card.title}
                       </p>
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* bottom tag (always visible small) */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                  {/* <div className="absolute bottom-0 left-0 right-0 p-4">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/35 border border-[#8B5A2B]/40 backdrop-blur">
                       <span className="w-2 h-2 rounded-full bg-[#C98A5A]" />
                       <p className="text-xs text-[#E7D2B6]/90">{card.title}</p>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               ))}
             </div>

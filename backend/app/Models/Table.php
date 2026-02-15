@@ -40,16 +40,13 @@ class Table extends Model
         }
 
         // Check for overlapping reservations that are not cancelled
+        // Two time ranges overlap if: start1 < end2 AND end1 > start2
         $overlapping = $this->reservations()
             ->where('reservation_date', $date)
             ->whereIn('status', ['pending', 'confirmed'])
             ->where(function ($query) use ($startTime, $endTime) {
-                $query->whereBetween('start_time', [$startTime, $endTime])
-                    ->orWhereBetween('end_time', [$startTime, $endTime])
-                    ->orWhere(function ($q) use ($startTime, $endTime) {
-                        $q->where('start_time', '<=', $startTime)
-                          ->where('end_time', '>=', $endTime);
-                    });
+                $query->where('start_time', '<', $endTime)
+                      ->where('end_time', '>', $startTime);
             })
             ->exists();
 

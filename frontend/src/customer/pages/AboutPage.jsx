@@ -1,15 +1,15 @@
 import React from "react";
+import Footer from "../components/Footer";
 
 const AboutPage = () => {
   return (
+    <>
     <main className="min-h-screen bg-[#0F0A08] text-[#E7D2B6]">
       {/* Header / Hero */}
       <section className="px-4 md:px-10 pt-14 pb-10">
         <div className="max-w-6xl mx-auto">
-          <p className="text-sm tracking-widest uppercase text-[#E7D2B6]/70">
-            About The Wooden Plate
-          </p>
-          <h1 className="mt-3 text-3xl md:text-5xl font-extrabold leading-tight">
+          
+          <h1 className="mt-18 text-3xl md:text-5xl font-extrabold leading-tight">
             A warm place for great burgers,
             <span className="text-[#D7B38A]"> crafted with care</span>.
           </h1>
@@ -47,7 +47,7 @@ const AboutPage = () => {
             <img
               src="https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1200&auto=format&fit=crop"
               alt="Our burgers"
-              className="w-full h-[320px] md:h-[420px] object-cover"
+              className="w-full h-80 md:h-[420px] object-cover"
             />
           </div>
 
@@ -55,7 +55,7 @@ const AboutPage = () => {
             <h2 className="text-2xl md:text-3xl font-extrabold">
               Our Story
             </h2>
-            <div className="w-28 h-[3px] rounded-full bg-gradient-to-r from-[#D7B38A] to-[#D7B38A]/20 mt-3" />
+            <div className="w-28 h-[3px] rounded-full bg-linear-to-r from-[#D7B38A] to-[#D7B38A]/20 mt-3" />
 
             <p className="mt-6 text-[#E7D2B6]/75 leading-relaxed">
               We started with a simple idea: serve food that feels familiar, but
@@ -135,7 +135,7 @@ const AboutPage = () => {
               href="https://www.google.com/maps"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-gradient-to-r from-[#D7B38A] to-[#C4A57B] text-[#1A120F] font-semibold hover:-translate-y-0.5 transition"
+              className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-linear-to-r from-[#D7B38A] to-[#C4A57B] text-[#1A120F] font-semibold hover:-translate-y-0.5 transition"
             >
               Open in Google Maps
             </a>
@@ -150,6 +150,9 @@ const AboutPage = () => {
         </div>
       </section>
     </main>
+
+      <Footer />
+    </>
   );
 };
 
