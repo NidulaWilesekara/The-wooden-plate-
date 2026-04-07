@@ -1,102 +1,82 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import MenuItemTiltCard from "../components/MenuItemTiltCard";
 import Footer from "../components/Footer";
 
-const categories = [
-  { label: "All Items", value: "all" },
-  { label: "Burgers", value: "burgers" },
-  { label: "Sides", value: "sides" },
-  { label: "Drinks", value: "drinks" },
-  { label: "Desserts", value: "desserts" },
-];
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
-// dummy items (later API)
-const allItems = [
-  {
-    id: 1,
-    category: "burgers",
-    name: "Classic Beef Burger",
-    description: "Juicy beef patty, cheese, lettuce, house sauce",
-    price: 1850,
-    image:
-      "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    id: 2,
-    category: "burgers",
-    name: "Crispy Chicken Burger",
-    description: "Crunchy chicken, spicy mayo, fresh slaw",
-    price: 1650,
-    image:
-      "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    id: 3,
-    category: "sides",
-    name: "Loaded Fries",
-    description: "Cheese sauce, spicy bits, fresh herbs",
-    price: 950,
-    image:
-      "https://images.unsplash.com/photo-1561758033-d89a9ad46330?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    id: 4,
-    category: "drinks",
-    name: "Iced Coffee",
-    description: "Chilled coffee with milk & sweetness",
-    price: 650,
-    image:
-      "https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    id: 5,
-    category: "desserts",
-    name: "Chocolate Brownie",
-    description: "Rich chocolate brownie with soft center",
-    price: 750,
-    image:
-      "https://images.unsplash.com/photo-1541781408260-3c22b5f65b25?q=80&w=1200&auto=format&fit=crop",
-  },
-];
+const resolveImageUrl = (image) => {
+  if (!image) return "";
+  if (image.startsWith("http://") || image.startsWith("https://")) return image;
+  if (image.startsWith("/storage/")) return `${API_BASE}${image}`;
+  return `${API_BASE}/storage/${image}`;
+};
 
 export default function MenuPage() {
-  const [params] = useSearchParams();
-  const initialCat = params.get("cat") || "all";
+  const [params, setParams] = useSearchParams();
+  const activeCatId = params.get("category_id") || "all";
 
-  const [activeCat, setActiveCat] = useState(
-    categories.some((c) => c.value === initialCat) ? initialCat : "all"
-  );
+  const [categories, setCategories] = useState([]);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
 
-  const filtered = useMemo(() => {
-    let list = [...allItems];
-    if (activeCat !== "all") list = list.filter((i) => i.category === activeCat);
-    if (q.trim()) {
-      const t = q.toLowerCase();
-      list = list.filter(
-        (i) =>
-          i.name.toLowerCase().includes(t) ||
-          i.description.toLowerCase().includes(t)
-      );
+  // Fetch categories once
+  useEffect(() => {
+    fetch(`${API_BASE}/api/public/categories`)
+      .then((r) => r.json())
+      .then((d) => setCategories(d.data || []))
+      .catch(console.error);
+  }, []);
+
+  // Fetch items whenever category changes
+  useEffect(() => {
+    setLoading(true);
+    const url =
+      activeCatId === "all"
+        ? `${API_BASE}/api/public/menu-items`
+        : `${API_BASE}/api/public/menu-items?category_id=${activeCatId}`;
+
+    fetch(url)
+      .then((r) => r.json())
+      .then((d) =>
+        setItems(
+          (d.data || []).map((i) => ({ ...i, image: resolveImageUrl(i.image) }))
+        )
+      )
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [activeCatId]);
+
+  const allCategories = [
+    { id: "all", name: "All Items" },
+    ...categories,
+  ];
+
+  const handleCategoryClick = (id) => {
+    setQ("");
+    if (id === "all") {
+      setParams({});
+    } else {
+      setParams({ category_id: id });
     }
-    return list;
-  }, [activeCat, q]);
+  };
+
+  // Client-side search on already-fetched items
+  const filteredItems = items.filter((i) => {
+    if (!q.trim()) return true;
+    const t = q.toLowerCase();
+    return (
+      i.name.toLowerCase().includes(t) ||
+      (i.description || "").toLowerCase().includes(t)
+    );
+  });
 
   return (
     <>
       <main className="min-h-screen bg-[#0F0A08] text-[#E7D2B6]">
         <section className="px-4 md:px-10 pt-14 pb-10">
           <div className="max-w-6xl mx-auto">
-            {/* <div className="text-center">
-              <h1 className="text-3xl md:text-5xl font-extrabold text-[#C98A5A]">
-                Explore Our Menu
-              </h1>
-              <p className="mt-3 text-[#BFA58A] max-w-2xl mx-auto">
-                Pick a category and discover your next favorite bite.
-              </p>
-            </div> */}
-
             {/* Search */}
             <div className="mt-10 max-w-2xl mx-auto">
               <input
@@ -111,12 +91,13 @@ export default function MenuPage() {
 
             {/* Category tabs */}
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              {categories.map((c) => {
-                const active = c.value === activeCat;
+              {allCategories.map((c) => {
+                const id = c.id;
+                const active = id.toString() === activeCatId.toString();
                 return (
                   <button
-                    key={c.value}
-                    onClick={() => setActiveCat(c.value)}
+                    key={id}
+                    onClick={() => handleCategoryClick(id)}
                     className={`px-5 py-2.5 rounded-full border transition text-sm font-semibold
                       ${
                         active
@@ -124,25 +105,35 @@ export default function MenuPage() {
                           : "bg-[#1A110D] text-[#E7D2B6] border-[#8B5A2B]/45 hover:border-[#C98A5A]/70"
                       }`}
                   >
-                    {c.label}
+                    {c.name}
                   </button>
                 );
               })}
             </div>
 
             {/* Items grid */}
-            <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((item) => (
-                <MenuItemTiltCard
-                  key={item.id}
-                  item={item}
-                  onAddToCart={(x) => console.log("Add to cart:", x)}
-                />
-              ))}
-            </div>
+            {loading ? (
+              <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map((n) => (
+                  <div
+                    key={n}
+                    className="h-72 rounded-2xl bg-[#1A110D] animate-pulse"
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredItems.map((item) => (
+                  <MenuItemTiltCard
+                    key={item.id}
+                    item={item}
+                    onAddToCart={(x) => console.log("Add to cart:", x)}
+                  />
+                ))}
+              </div>
+            )}
 
-            {/* empty */}
-            {!filtered.length && (
+            {!loading && !filteredItems.length && (
               <div className="mt-14 text-center text-[#BFA58A]">
                 No items found for your filter.
               </div>

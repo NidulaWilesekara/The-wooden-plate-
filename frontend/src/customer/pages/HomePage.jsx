@@ -3,9 +3,7 @@ import Hero from "../components/Hero";
 import AboutSection from "../components/AboutSection";
 import ChefsSpecials from "../components/ChefsSpecials";
 import GallerySection from "../components/GallerySection";
-import ReservationSection from "../components/ReservationSection";
 import ContactSection from "../components/ContactSection";
-import Newsletter from "../components/Newsletter";
 import PromoBannerStrip from "../components/PromoBannerStrip";
 import NewProductBannerStrip from "../components/NewProductBannerStrip";
 import MenuCategoriesSection from "../components/MenuCategoriesSection";
@@ -28,11 +26,7 @@ const HomePage = () => {
 
       <GallerySection/>
 
-      <ReservationSection/>
-
       <ContactSection />
-
-      <Newsletter />
 
       <Footer />
 

@@ -42,17 +42,6 @@ export default function MenuItemTiltCard({ item, onAddToCart }) {
         <p className="mt-2 text-sm text-[#E7D2B6]/70 line-clamp-2">
           {item.description}
         </p>
-
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onAddToCart?.(item);
-          }}
-          className="mt-5 w-full py-3 rounded-2xl bg-[#D7B38A]/10 border border-[#D7B38A]/30
-                     text-[#D7B38A] text-sm font-semibold hover:bg-[#D7B38A] hover:text-[#0F0A08] transition"
-        >
-          Add to Cart
-        </button>
       </div>
     </div>
   );

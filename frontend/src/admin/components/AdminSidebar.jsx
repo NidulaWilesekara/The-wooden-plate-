@@ -23,34 +23,6 @@ const AdminSidebar = () => {
       ),
     },
     {
-      name: "Customers",
-      path: "/admin/customers",
-      icon: (
-        <svg className="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-          />
-        </svg>
-      ),
-    },
-    {
-      name: "Orders",
-      path: "/admin/orders",
-      icon: (
-        <svg className="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-          />
-        </svg>
-      ),
-    },
-    {
       name: "Products",
       path: "/admin/products",
       icon: (
@@ -107,29 +79,6 @@ const AdminSidebar = () => {
       ),
     },
     {
-      name: "Reservations",
-      path: "/admin/reservations",
-      icon: (
-        <svg className="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-          />
-        </svg>
-      ),
-    },
-    {
-      name: "Tables",
-      path: "/admin/tables",
-      icon: (
-        <svg className="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-        </svg>
-      ),
-    },
-    {
       name: "Gallery",
       path: "/admin/gallery",
       icon: (
@@ -144,29 +93,15 @@ const AdminSidebar = () => {
       ),
     },
     {
-      name: "Inventory",
-      path: "/admin/inventory",
+      name: "Contact Messages",
+      path: "/admin/contact-messages",
       icon: (
         <svg className="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-          />
-        </svg>
-      ),
-    },
-    {
-      name: "Reports",
-      path: "/admin/reports",
-      icon: (
-        <svg className="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
           />
         </svg>
       ),

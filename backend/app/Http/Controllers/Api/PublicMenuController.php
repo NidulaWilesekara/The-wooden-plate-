@@ -16,7 +16,7 @@ class PublicMenuController extends Controller
     {
         $categories = Category::where('is_active', true)
             ->orderBy('name')
-            ->get(['id', 'name', 'description', 'image']);
+            ->get(['id', 'name', 'image']);
 
         return response()->json([
             'success' => true,
@@ -70,8 +70,10 @@ class PublicMenuController extends Controller
      */
     public function featuredItems()
     {
-        $items = MenuItem::where('is_available', true)
-            ->where('is_featured', true) // You can add this column later
+        $items = MenuItem::with('category:id,name')
+            ->where('is_available', true)
+            ->where('is_popular', true)
+            ->orderBy('updated_at', 'desc')
             ->limit(8)
             ->get();
 

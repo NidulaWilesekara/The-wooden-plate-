@@ -19,15 +19,26 @@ class UpdateMenuItemRequest extends FormRequest
             'price' => 'sometimes|required|numeric|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'description' => 'nullable|string',
-            'is_available' => 'nullable'
+            'is_available' => 'sometimes|boolean',
+            'is_popular' => 'sometimes|boolean'
         ];
     }
 
     protected function prepareForValidation()
     {
-        $this->merge([
-            'is_available' => filter_var($this->is_available, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true,
-        ]);
+        $payload = [];
+
+        if ($this->has('is_available')) {
+            $payload['is_available'] = filter_var($this->is_available, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+        }
+
+        if ($this->has('is_popular')) {
+            $payload['is_popular'] = filter_var($this->is_popular, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+        }
+
+        if (!empty($payload)) {
+            $this->merge($payload);
+        }
     }
 
     public function messages(): array

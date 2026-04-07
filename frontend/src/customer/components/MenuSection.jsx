@@ -1,72 +1,52 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CategoryTabs from "./CategoryTabs";
 import MenuCarousel from "./MenuCarousel";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
+const resolveImageUrl = (image) => {
+  if (!image) return "";
+  if (image.startsWith("http://") || image.startsWith("https://")) return image;
+  if (image.startsWith("/storage/")) return `${API_BASE}${image}`;
+  return `${API_BASE}/storage/${image}`;
+};
 
 const MenuSection = () => {
-  const categories = [
+  const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/public/categories`)
+      .then((r) => r.json())
+      .then((d) => setCategories(d.data || []))
+      .catch(console.error);
+
+    fetch(`${API_BASE}/api/public/menu-items`)
+      .then((r) => r.json())
+      .then((d) =>
+        setItems(
+          (d.data || []).map((i) => ({ ...i, image: resolveImageUrl(i.image) }))
+        )
+      )
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const allCategories = [
     { label: "All Dishes", value: "all" },
-    { label: "Starters", value: "starters" },
-    { label: "Main Course", value: "main" },
-    { label: "Desserts", value: "desserts" },
+    ...categories.map((c) => ({ label: c.name, value: c.id })),
   ];
 
-  const [activeCat, setActiveCat] = useState("all");
-
-  // dummy menu items (later API)
-  const items = [
-    {
-      id: 1,
-      category: "starters",
-      name: "Truffle Mushroom Bruschetta",
-      description: "Artisan bread topped with sautéed mushrooms",
-      price: 14,
-      image:
-        "https://images.unsplash.com/photo-1541013406133-8ec3a2d08097?auto=format&fit=crop&w=1200&q=80",
-    },
-    {
-      id: 2,
-      category: "starters",
-      name: "Artisan Cheese Board",
-      description: "Selection of premium aged cheeses",
-      price: 18,
-      image:
-        "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=1200&q=80",
-    },
-    {
-      id: 3,
-      category: "main",
-      name: "Grilled Ribeye Steak",
-      description: "Prime cut with seasonal vegetables",
-      price: 38,
-      image:
-        "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=1200&q=80",
-    },
-    {
-      id: 4,
-      category: "main",
-      name: "Pan-Seared Salmon",
-      description: "Fresh Atlantic salmon with lemon butter",
-      price: 32,
-      image:
-        "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1200&q=80",
-    },
-    {
-      id: 5,
-      category: "desserts",
-      name: "Wild Mushroom Risotto",
-      description: "Creamy arborio rice with truffle oil",
-      price: 26,
-      image:
-        "https://images.unsplash.com/photo-1604908176997-125f25cc500f?auto=format&fit=crop&w=1200&q=80",
-    },
-  ];
-
-  const filteredItems = useMemo(() => {
-    if (activeCat === "all") return items;
-    return items.filter((i) => i.category === activeCat);
-  }, [activeCat]);
+  const handleCategoryChange = (value) => {
+    if (value === "all") {
+      navigate("/menu");
+    } else {
+      navigate(`/menu?category_id=${value}`);
+    }
+  };
 
   return (
     <section
@@ -84,16 +64,27 @@ const MenuSection = () => {
           </p>
         </div>
 
-        {/* Categories */}
+        {/* Categories — clicking navigates to /menu?category_id=... */}
         <CategoryTabs
-          categories={categories}
-          active={activeCat}
-          onChange={setActiveCat}
+          categories={allCategories}
+          active="all"
+          onChange={handleCategoryChange}
         />
 
         {/* Cards (horizontal scroll) */}
         <div className="mt-10">
-          <MenuCarousel items={filteredItems} />
+          {loading ? (
+            <div className="flex gap-6 overflow-hidden">
+              {[1, 2, 3].map((n) => (
+                <div
+                  key={n}
+                  className="shrink-0 basis-[85%] sm:basis-[48%] lg:basis-[32%] h-64 rounded-2xl bg-[#1A110D] animate-pulse"
+                />
+              ))}
+            </div>
+          ) : (
+            <MenuCarousel items={items} />
+          )}
         </div>
       </div>
     </section>

@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 
 /**
  * Admin Login Component
- * 
+ *
  * Backend API Endpoints:
  * ----------------------
  * POST   /api/admin/login              - Admin login (email, password)
@@ -12,15 +12,7 @@ import toast, { Toaster } from "react-hot-toast";
  * GET    /api/admin/profile            - Get admin profile (requires token)
  * PUT    /api/admin/profile            - Update admin profile (requires token)
  * GET    /api/admin/dashboard          - Admin dashboard data (requires token)
- * 
- * Customer Management Endpoints (Protected):
- * ------------------------------------------
- * GET    /api/admin/customers          - Get all customers
- * POST   /api/admin/customers          - Create new customer
- * GET    /api/admin/customers/{id}     - Get single customer
- * PUT    /api/admin/customers/{id}     - Update customer
- * DELETE /api/admin/customers/{id}     - Delete customer
- * 
+ *
  * Authentication:
  * ---------------
  * - Uses Laravel Sanctum token authentication
@@ -37,6 +29,13 @@ const AdminLogin = () => {
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("admin_token");
+    if (token) {
+      navigate("/admin/dashboard", { replace: true });
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,10 +65,8 @@ const AdminLogin = () => {
       localStorage.setItem("admin_user", JSON.stringify(data.user));
       
       toast.success("Login successful! Redirecting...", { id: loadingToast });
-      
-      setTimeout(() => {
-        navigate("/admin/dashboard", { replace: true });
-      }, 500);
+
+      navigate("/admin/dashboard", { replace: true });
     } catch (err) {
       const errorMessage = err.message || "Something went wrong";
       toast.error(errorMessage, { id: loadingToast });

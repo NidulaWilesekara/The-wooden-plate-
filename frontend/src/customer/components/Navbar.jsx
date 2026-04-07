@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useCustomerAuth } from "../../contexts/CustomerAuthContext";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const navLinks = [
   { name: "Home", id: "home" },
   { name: "Menu", id: "menu" },
   { name: "About", id: "about" },
   { name: "Gallery", id: "gallery" },
-  { name: "Reservation", id: "reservation" },
   { name: "Contact", id: "contact" },
 ];
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { customer, isAuthenticated, logout } = useCustomerAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const onScroll = () => {
@@ -25,16 +24,21 @@ const Navbar = () => {
   }, []);
 
   const scrollTo = (id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const y = el.getBoundingClientRect().top + window.scrollY - 90;
-    window.scrollTo({ top: y, behavior: "smooth" });
     setIsMenuOpen(false);
-  };
+    const doScroll = () => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const y = el.getBoundingClientRect().top + window.scrollY - 90;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    };
 
-  const handleLogout = async () => {
-    await logout();
-    setIsMenuOpen(false);
+    // If not on homepage, navigate there first then scroll
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(doScroll, 300);
+    } else {
+      doScroll();
+    }
   };
 
   return (
@@ -67,41 +71,25 @@ const Navbar = () => {
               className="relative group cursor-pointer hover:text-[#D7B38A] transition"
             >
               {link.name}
-              <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-[#D7B38A] group-hover:w-full transition-all" />
+              <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-[#D7B38A] group-hover:w-full transition-all" />
             </button>
           ))}
         </div>
 
         {/* Right buttons */}
         <div className="hidden md:flex items-center gap-3">
-          {isAuthenticated() ? (
-            <>
-              <span className="text-[#E7D2B6] text-sm">
-                Hi, <span className="text-[#D7B38A] font-medium">{customer?.name?.split(' ')[0] || 'Guest'}</span>
-              </span>
-              <button 
-                onClick={handleLogout}
-                className="px-4 py-2 rounded-full border border-[#D7B38A]/50 text-[#E7D2B6] hover:bg-red-500/20 hover:border-red-500/50 transition"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link 
-                to="/login" 
-                className="px-4 py-2 rounded-full border border-[#D7B38A]/50 text-[#E7D2B6] hover:bg-[#D7B38A]/10 transition"
-              >
-                Login
-              </Link>
-              <Link 
-                to="/register" 
-                className="px-4 py-2 rounded-full bg-[#D7B38A] text-[#1A120F] hover:opacity-90 transition"
-              >
-                Register
-              </Link>
-            </>
-          )}
+          <Link
+            to="/menu"
+            className="px-4 py-2 rounded-full border border-[#D7B38A]/50 text-[#E7D2B6] hover:bg-[#D7B38A]/10 transition"
+          >
+            Explore Menu
+          </Link>
+          {/* <Link
+            to="/contact"
+            className="px-4 py-2 rounded-full bg-[#D7B38A] text-[#1A120F] hover:opacity-90 transition"
+          >
+            Contact Us
+          </Link> */}
         </div>
 
         {/* Mobile menu icon */}
@@ -137,34 +125,20 @@ const Navbar = () => {
           </button>
         ))}
 
-        {isAuthenticated() ? (
-          <>
-            <span className="text-[#D7B38A] font-medium">
-              {customer?.name || 'Guest'}
-            </span>
-            <button 
-              onClick={handleLogout}
-              className="px-6 py-2 rounded-full border border-red-500/50 text-red-400 hover:bg-red-500/20 transition"
-            >
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link 
-              to="/login" 
-              className="px-6 py-2 rounded-full border border-[#D7B38A] hover:bg-[#D7B38A]/10 transition"
-            >
-              Login
-            </Link>
-            <Link 
-              to="/register" 
-              className="px-6 py-2 rounded-full bg-[#D7B38A] text-[#1A120F] hover:opacity-90 transition"
-            >
-              Register
-            </Link>
-          </>
-        )}
+        <Link
+          to="/menu"
+          className="px-6 py-2 rounded-full border border-[#D7B38A] hover:bg-[#D7B38A]/10 transition"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          Explore Menu
+        </Link>
+        <Link
+          to="/contact"
+          className="px-6 py-2 rounded-full bg-[#D7B38A] text-[#1A120F] hover:opacity-90 transition"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          Contact Us
+        </Link>
       </div>
     </nav>
   );

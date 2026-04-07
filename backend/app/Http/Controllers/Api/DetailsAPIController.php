@@ -9,6 +9,25 @@ use App\Http\Requests\UpdateDetailsRequest;
 
 class DetailsAPIController extends Controller
 {
+    public function publicLatest()
+    {
+        try {
+            $details = Details::query()
+                ->latest('updated_at')
+                ->latest('id')
+                ->first();
+
+            return response()->json([
+                'data' => $details,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to retrieve business details',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */

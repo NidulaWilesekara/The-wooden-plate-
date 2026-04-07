@@ -26,7 +26,7 @@ const Hero = () => {
       <div className="absolute inset-0 bg-black/60" />
 
       {/* Top Gradient (like screenshot) */}
-      <div className="absolute top-0 left-0 right-0 h-44 bg-gradient-to-b from-[#1A120F]/90 to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-44 bg-linear-to-b from-[#1A120F]/90 to-transparent" />
 
       {/* Content */}
       <div className="relative z-10 flex min-h-screen items-center justify-center px-6">
@@ -51,11 +51,11 @@ const Hero = () => {
             </button>
 
             <button
-              onClick={() => scrollTo("reservation")}
+              onClick={() => scrollTo("contact")}
               className="px-7 py-3 rounded-full border border-[#D7B38A]/70 text-[#E7D2B6] font-medium
                          hover:bg-[#D7B38A]/10 transition"
             >
-              Book a Table
+              Contact Us
             </button>
           </div>
         </div>

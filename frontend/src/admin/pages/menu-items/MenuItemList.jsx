@@ -93,9 +93,12 @@ const MenuItemList = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...item,
           category_id: item.category_id,
+          name: item.name,
+          price: item.price,
+          description: item.description,
           is_available: !item.is_available,
+          is_popular: item.is_popular,
         }),
       });
 
@@ -117,8 +120,11 @@ const MenuItemList = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...item,
           category_id: item.category_id,
+          name: item.name,
+          price: item.price,
+          description: item.description,
+          is_available: item.is_available,
           is_popular: !item.is_popular,
         }),
       });
@@ -263,24 +269,15 @@ const MenuItemList = () => {
                           </td>
 
                           <td className="px-4 py-3 border-t border-gray-200 border-r border-gray-200 text-left">
-                            <div className="flex items-center gap-3">
-                              {m.image && (
-                                <img
-                                  src={m.image}
-                                  alt={m.name}
-                                  className="w-10 h-10 rounded object-cover"
-                                />
-                              )}
-                              <div>
-                                <div className="truncate text-gray-900 font-medium">
-                                  {m.name || '—'}
-                                </div>
-                                {m.description && (
-                                  <div className="text-xs text-gray-500 truncate max-w-xs">
-                                    {m.description}
-                                  </div>
-                                )}
+                            <div>
+                              <div className="truncate text-gray-900 font-medium">
+                                {m.name || '—'}
                               </div>
+                              {m.description && (
+                                <div className="text-xs text-gray-500 truncate max-w-xs">
+                                  {m.description}
+                                </div>
+                              )}
                             </div>
                           </td>
 

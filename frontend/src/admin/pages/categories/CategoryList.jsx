@@ -218,17 +218,8 @@ const CategoryList = () => {
                           </td>
 
                           <td className="px-4 py-3 border-t border-gray-200 border-r border-gray-200 text-left">
-                            <div className="flex items-center gap-3">
-                              {c.image && (
-                                <img
-                                  src={c.image}
-                                  alt={c.name}
-                                  className="w-10 h-10 rounded-full object-cover"
-                                />
-                              )}
-                              <div className="truncate text-gray-900 font-medium">
-                                {c.name || '—'}
-                              </div>
+                            <div className="truncate text-gray-900 font-medium">
+                              {c.name || '—'}
                             </div>
                           </td>
 
